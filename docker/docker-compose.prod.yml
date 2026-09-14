@@ -1,0 +1,102 @@
+# Typepress Production Docker Compose
+#
+# Usage:
+#   docker compose -f docker/docker-compose.prod.yml up -d
+#
+# Services:
+#   - api: Fastify REST API + GraphQL + Socket.IO
+#   - admin: Next.js admin panel
+#   - renderer: Next.js public site
+#   - postgres: PostgreSQL database
+#   - redis: Redis cache/sessions
+#   - nginx: Reverse proxy
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-typepress}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-typepress}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U typepress']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.api
+    ports:
+      - '8000:8000'
+    environment:
+      DATABASE_URL: postgresql://typepress:${POSTGRES_PASSWORD}@postgres:5432/typepress
+      REDIS_URL: redis://redis:6379
+      SESSION_SECRET: ${SESSION_SECRET}
+      ADMIN_URL: ${ADMIN_URL:-http://localhost}
+      NODE_ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  admin:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.admin
+    ports:
+      - '4000:4000'
+    environment:
+      NEXT_PUBLIC_API_URL: http://api:8000
+      NODE_ENV: production
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  renderer:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.renderer
+    ports:
+      - '4001:4001'
+    environment:
+      API_URL: http://api:8000
+      NODE_ENV: production
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+      - admin
+      - renderer
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

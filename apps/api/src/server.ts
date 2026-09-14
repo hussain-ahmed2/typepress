@@ -4,12 +4,13 @@
  * Boot sequence:
  *   1. Create Fastify instance with logging
  *   2. Register CORS, cookies, sessions
- *   3. Register error handler and hooks
- *   4. Register all features
- *   5. Load plugins
- *   6. Register GraphQL
- *   7. Initialize Socket.IO for real-time
- *   8. Health endpoint
+ *   3. Register security (helmet, compression, rate limiting)
+ *   4. Register error handler and hooks
+ *   5. Register all features
+ *   6. Load plugins
+ *   7. Register GraphQL
+ *   8. Initialize Socket.IO
+ *   9. Health endpoint
  */
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
@@ -19,6 +20,8 @@ import { config } from './config';
 import { register_features } from './features';
 import { register_error_handler } from './infrastructure/error_handler';
 import { register_hooks } from './infrastructure/hooks_integration';
+import { register_rate_limiting } from './infrastructure/rate_limit';
+import { register_security } from './infrastructure/security';
 import { load_plugins } from './plugin_loader';
 import { PluginManager } from '@typepress/core';
 import { register_graphql } from './graphql';
@@ -42,6 +45,10 @@ export async function create_server() {
       maxAge: 24 * 60 * 60 * 1000,
     },
   });
+
+  // Security: rate limiting, headers, compression
+  await register_rate_limiting(app);
+  await register_security(app);
 
   register_error_handler(app);
   register_hooks(app);
@@ -68,17 +75,9 @@ export async function create_server() {
   return app;
 }
 
-/**
- * Start the server with Socket.IO.
- * Call this after creating the server to attach real-time capabilities.
- */
 export async function start_server() {
   const app = await create_server();
-
-  // Start listening
   await app.listen({ port: config.API_PORT, host: config.API_HOST });
   console.log(`API server running on http://${config.API_HOST}:${config.API_PORT}`);
-
-  // Attach Socket.IO to the underlying HTTP server
   create_socket_server(app.server);
 }
