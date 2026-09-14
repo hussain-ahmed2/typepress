@@ -1,0 +1,28 @@
+{
+  "name": "@typepress/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@fastify/cors": "^10.0.0",
+    "@fastify/cookie": "^11.0.0",
+    "@fastify/session": "^11.0.0",
+    "fastify": "^5.3.0",
+    "@typepress/db": "workspace:*",
+    "@typepress/core": "workspace:*",
+    "@typepress/shared-types": "workspace:*",
+    "dotenv": "^16.4.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.0.0"
+  }
+}

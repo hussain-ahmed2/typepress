@@ -1,0 +1,96 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+  AUTHOR
+  VIEWER
+}
+
+enum ContentStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  TRASH
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String?
+  password_hash  String
+  role           UserRole @default(AUTHOR)
+  capabilities   Json     @default("[]")
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  contents       Content[]
+  media          Media[]
+  sessions       Session[]
+}
+
+model Content {
+  id          String             @id @default(cuid())
+  type        String
+  slug        String             @unique
+  title       String
+  status      ContentStatus      @default(DRAFT)
+  meta        Json               @default("{}")
+  author_id   String
+  author      User               @relation(fields: [author_id], references: [id])
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @updatedAt
+  taxonomies  TaxonomyRelation[]
+
+  @@index([type, status])
+  @@index([author_id])
+}
+
+model Media {
+  id           String   @id @default(cuid())
+  filename     String
+  mimetype     String
+  size         Int
+  url          String
+  uploader_id  String
+  uploader     User     @relation(fields: [uploader_id], references: [id])
+  created_at   DateTime @default(now())
+}
+
+model Taxonomy {
+  id         String             @id @default(cuid())
+  name       String
+  slug       String             @unique
+  type       String
+  parent_id  String?
+  parent     Taxonomy?          @relation("TaxonomyTree", fields: [parent_id], references: [id])
+  children   Taxonomy[]         @relation("TaxonomyTree")
+  contents   TaxonomyRelation[]
+
+  @@index([type])
+}
+
+model TaxonomyRelation {
+  content_id   String
+  taxonomy_id  String
+  content      Content  @relation(fields: [content_id], references: [id], onDelete: Cascade)
+  taxonomy     Taxonomy @relation(fields: [taxonomy_id], references: [id], onDelete: Cascade)
+
+  @@id([content_id, taxonomy_id])
+}
+
+model Session {
+  id          String   @id
+  user_id     String
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  expires_at  DateTime
+
+  @@index([user_id])
+}
