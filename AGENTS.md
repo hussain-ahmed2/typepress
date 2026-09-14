@@ -36,16 +36,17 @@ typepress/
   plugins/       → First-party plugin packages
   themes/        → First-party theme packages
   docker/        → Infrastructure config
+  .plans/        → Project plans and execution logs
 ```
 
 ### Dependency Flow
 ```
 apps/* → packages/* (never the reverse)
 packages/shared-types → no dependencies (leaf node)
-packages/core → packages/shared-types
+packages/core → packages/shared-types, fastify
 packages/db → @prisma/client
 packages/plugin-sdk → packages/core, packages/shared-types
-packages/theme-sdk → packages/shared-types
+packages/theme-sdk → packages/shared-types, react
 ```
 
 **Rule:** Apps depend on packages. Packages never depend on apps.
@@ -58,6 +59,86 @@ All internal dependencies use `workspace:*` in package.json:
     "@typepress/core": "workspace:*"
   }
 }
+```
+
+---
+
+## Feature-Based Architecture
+
+### Core Concept
+Each feature (auth, content, media, taxonomy) is a **self-contained module** with its own routes, service, validators, and types. Features register via a `FeaturePlugin` contract in `@typepress/core`.
+
+### Feature Directory Structure
+```
+apps/api/src/features/
+  auth/
+    index.ts              # FeaturePlugin export
+    auth.routes.ts        # HTTP handlers
+    auth.service.ts       # Business logic (OOP class)
+    auth.validators.ts    # Zod schemas
+    auth.types.ts         # Feature-internal types
+  content/
+    index.ts
+    content.routes.ts
+    content.service.ts
+    content.validators.ts
+  media/
+    index.ts
+    media.routes.ts
+    media.service.ts
+    media.validators.ts
+  taxonomy/
+    index.ts
+    taxonomy.routes.ts
+    taxonomy.service.ts
+    taxonomy.validators.ts
+  index.ts                # Feature registry — imports + registers all features
+```
+
+### Adding a New Feature
+1. Create directory under `apps/api/src/features/your_feature/`
+2. Implement `FeaturePlugin` interface (name, version, register)
+3. Create routes, service, validators following existing patterns
+4. Import and register in `apps/api/src/features/index.ts`
+
+**That's it — no existing code needs modification.**
+
+### Feature Contract
+```typescript
+interface FeaturePlugin {
+  name: string;           // Used as route prefix: /api/{name}
+  version: string;
+  dependencies?: string[]; // Features that must load first
+  register: (app: FastifyInstance, context: FeatureContext) => void | Promise<void>;
+}
+
+interface FeatureContext {
+  hooks: HookRegistry;    // Access to the hook system
+}
+```
+
+### Dependency Rules
+```
+Features CAN import from:
+  @typepress/core        (hooks, capabilities, feature contracts)
+  @typepress/db          (Prisma client)
+  @typepress/shared-types (type definitions)
+  ../../infrastructure/  (shared middleware)
+
+Features MUST NOT import from other features.
+Cross-feature communication happens exclusively through the hook system.
+```
+
+### Infrastructure Layer
+```
+apps/api/src/infrastructure/
+  middleware/
+    validation.middleware.ts   # Zod body/query/params validation
+    auth.middleware.ts         # require_auth, require_capability
+    index.ts                  # Barrel exports
+  error_handler.ts            # Global Fastify error handler
+  hooks_integration.ts        # Wires HookRegistry into Fastify lifecycle
+  index.ts                    # Barrel exports
 ```
 
 ---
@@ -86,6 +167,7 @@ All internal dependencies use `workspace:*` in package.json:
 - One primary export per file (class or module)
 - Barrel exports via `index.ts`
 - Keep files under 200 lines — split if longer
+- Every file starts with a JSDoc comment explaining its purpose
 
 ---
 
@@ -108,14 +190,6 @@ All internal dependencies use `workspace:*` in package.json:
 
 ## API (Fastify)
 
-### Route Structure
-```
-apps/api/src/routes/
-  health.ts      → GET /health
-  content.ts     → GET/POST/PUT/DELETE /api/content
-  auth.ts        → POST /api/auth/login, /logout, GET /api/auth/me
-```
-
 ### Response Format
 All API responses follow a consistent shape:
 ```typescript
@@ -125,14 +199,20 @@ interface ApiResponse<T> {
   error?: {
     code: string;
     message: string;
+    details?: unknown;
   };
 }
 ```
 
+### Validation
+- Validate all inputs with Zod schemas before processing
+- Use `validate_body`, `validate_query`, `validate_params` middleware
+- Return structured 400 errors with field-level details
+
 ### Error Handling
-- Use Fastify's `setErrorHandler` for global error handling
-- Validate request bodies with Zod before processing
-- Return proper HTTP status codes (400, 401, 403, 404, 500)
+- Global error handler catches all unhandled errors
+- Zod errors → 400, Not found → 404, Default → 500
+- Production mode sanitizes error messages
 
 ---
 
@@ -144,7 +224,7 @@ Every plugin must implement:
 interface Plugin {
   name: string;
   version: string;
-  requiredCapabilities?: Capability[];
+  required_capabilities?: Capability[];
   register: (core: PluginAPI) => void | Promise<void>;
 }
 ```
@@ -157,7 +237,7 @@ interface Plugin {
 
 ### What Plugins Cannot Do
 - Access the database directly (go through the API)
-- Modify other plugins' behavior
+- Modify other plugins' behavior directly (use hooks)
 - Bypass capability checks
 
 ---
@@ -230,10 +310,11 @@ refactor(core): convert PluginManager to class
 
 | File | Purpose |
 |---|---|
-| `PLAN.md` | Master plan with phased roadmap |
+| `.plans/00-master-plan.md` | Master plan with phased roadmap |
 | `AGENTS.md` | This file — coding instructions |
 | `.env.example` | Environment variable template |
 | `docker/docker-compose.yml` | Infrastructure services |
 | `packages/db/prisma/schema.prisma` | Database schema |
 | `turbo.json` | Build pipeline config |
 | `tsconfig.base.json` | Shared TypeScript config |
+| `vitest.config.ts` | Test configuration |
