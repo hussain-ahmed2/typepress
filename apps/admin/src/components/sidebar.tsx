@@ -2,17 +2,33 @@
  * Sidebar Component — Main navigation for the admin panel.
  *
  * Highlights the current route and provides links to all feature sections.
+ * Uses Lucide React for consistent, professional icons.
  */
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import {
+  LayoutDashboard,
+  FileText,
+  Paintbrush,
+  Image,
+  Tags,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
-const nav_items = [
-  { href: '/', label: 'Dashboard', icon: '📊' },
-  { href: '/content', label: 'Content', icon: '📝' },
-  { href: '/media', label: 'Media', icon: '🖼️' },
-  { href: '/taxonomy', label: 'Taxonomy', icon: '🏷️' },
+interface NavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+const nav_items: NavItem[] = [
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/content', label: 'Content', icon: FileText },
+  { href: '/builder', label: 'Builder', icon: Paintbrush },
+  { href: '/media', label: 'Media', icon: Image },
+  { href: '/taxonomy', label: 'Taxonomy', icon: Tags },
 ];
 
 export function Sidebar() {
@@ -29,6 +45,7 @@ export function Sidebar() {
         {nav_items.map((item) => {
           const is_active = pathname === item.href ||
             (item.href !== '/' && pathname.startsWith(item.href));
+          const Icon = item.icon;
 
           return (
             <Link
@@ -40,7 +57,7 @@ export function Sidebar() {
                   : 'text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
-              <span>{item.icon}</span>
+              <Icon size={18} />
               <span>{item.label}</span>
             </Link>
           );

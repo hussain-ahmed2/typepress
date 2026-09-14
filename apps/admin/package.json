@@ -9,16 +9,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@craftjs/core": "^0.2.12",
+    "@typepress/shared-types": "workspace:*",
+    "lucide-react": "^1.46.0",
     "next": "^15.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "@typepress/shared-types": "workspace:*"
+    "react-colorful": "^5.8.1",
+    "react-contenteditable": "^3.3.7",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.2",
-    "@types/react": "^19.0.0",
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
     "tailwindcss": "^4.0.0",
-    "@tailwindcss/postcss": "^4.0.0"
+    "typescript": "^5.7.2"
   }
 }
