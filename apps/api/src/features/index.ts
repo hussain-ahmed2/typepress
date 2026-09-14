@@ -19,6 +19,7 @@ import { taxonomy_feature } from './taxonomy';
 import { menu_feature } from './menu';
 import { user_feature } from './user';
 import { revision_feature } from './revision';
+import { search_feature } from './search';
 
 const feature_registry = new FeatureRegistry();
 
@@ -29,6 +30,7 @@ feature_registry.register(taxonomy_feature);
 feature_registry.register(menu_feature);
 feature_registry.register(user_feature);
 feature_registry.register(revision_feature);
+feature_registry.register(search_feature);
 
 /**
  * Boot all features into the Fastify instance.

@@ -3,16 +3,13 @@
  *
  * Boot sequence:
  *   1. Create Fastify instance with logging
- *   2. Register CORS (allows admin panel origin)
- *   3. Register cookie + session plugins (for auth)
- *   4. Register global error handler
- *   5. Register request lifecycle hooks
- *   6. Register all features (auth, content, media, taxonomy)
- *   7. Load plugins from plugins/ directory
- *   8. Health endpoint (infrastructure, not a feature)
- *
- * The server is a factory function — it returns the configured instance
- * without starting it. The entry point (index.ts) calls listen() separately.
+ *   2. Register CORS, cookies, sessions
+ *   3. Register error handler and hooks
+ *   4. Register all features
+ *   5. Load plugins
+ *   6. Register GraphQL
+ *   7. Initialize Socket.IO for real-time
+ *   8. Health endpoint
  */
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
@@ -24,6 +21,8 @@ import { register_error_handler } from './infrastructure/error_handler';
 import { register_hooks } from './infrastructure/hooks_integration';
 import { load_plugins } from './plugin_loader';
 import { PluginManager } from '@typepress/core';
+import { register_graphql } from './graphql';
+import { create_socket_server } from './realtime/socket';
 
 export async function create_server() {
   const app = Fastify({ logger: true });
@@ -34,14 +33,13 @@ export async function create_server() {
     credentials: true,
   });
 
-  // Cookie + session plugins — required for auth feature
   await app.register(cookie);
   await app.register(session, {
     secret: config.SESSION_SECRET,
     cookie: {
-      secure: false, // Set true in production with HTTPS
+      secure: false,
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: 24 * 60 * 60 * 1000,
     },
   });
 
@@ -54,15 +52,33 @@ export async function create_server() {
   // --- Plugins ---
   const plugin_manager = new PluginManager();
   await load_plugins(plugin_manager);
-  app.log.info(`Loaded ${plugin_manager.get_all().length} plugins`);
 
-  // --- Health check (not a feature — this is infrastructure) ---
+  // --- GraphQL ---
+  await register_graphql(app);
+
+  // --- Health check ---
   app.get('/health', async () => ({
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     plugins: plugin_manager.get_all().map((p) => `${p.name}@${p.version}`),
+    features: ['auth', 'content', 'media', 'taxonomy', 'menus', 'users', 'revisions', 'search'],
   }));
 
   return app;
+}
+
+/**
+ * Start the server with Socket.IO.
+ * Call this after creating the server to attach real-time capabilities.
+ */
+export async function start_server() {
+  const app = await create_server();
+
+  // Start listening
+  await app.listen({ port: config.API_PORT, host: config.API_HOST });
+  console.log(`API server running on http://${config.API_HOST}:${config.API_PORT}`);
+
+  // Attach Socket.IO to the underlying HTTP server
+  create_socket_server(app.server);
 }
