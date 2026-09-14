@@ -16,7 +16,8 @@ import { join } from 'path';
 import type { Plugin } from '@typepress/core';
 import { PluginManager } from '@typepress/core';
 
-const PLUGIN_DIR = join(process.cwd(), 'plugins');
+// Navigate from apps/api to the project root, then into plugins/
+const PLUGIN_DIR = join(process.cwd(), '..', '..', 'plugins');
 
 /**
  * Load all plugins from the plugins/ directory.
