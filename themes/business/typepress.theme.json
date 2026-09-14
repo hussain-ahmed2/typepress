@@ -1,0 +1,7 @@
+{
+  "name": "business",
+  "version": "0.1.0",
+  "description": "Professional business theme for Typepress",
+  "slots": ["header", "footer", "post_list", "single_post", "sidebar"],
+  "author": "Typepress"
+}

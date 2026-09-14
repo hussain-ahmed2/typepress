@@ -1,0 +1,8 @@
+{
+  "name": "comments",
+  "version": "0.1.0",
+  "description": "Adds comment system to content with moderation support",
+  "slots": ["comments"],
+  "dependencies": ["content"],
+  "author": "Typepress"
+}

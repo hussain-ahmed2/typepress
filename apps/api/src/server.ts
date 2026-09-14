@@ -8,7 +8,8 @@
  *   4. Register global error handler
  *   5. Register request lifecycle hooks
  *   6. Register all features (auth, content, media, taxonomy)
- *   7. Health endpoint (infrastructure, not a feature)
+ *   7. Load plugins from plugins/ directory
+ *   8. Health endpoint (infrastructure, not a feature)
  *
  * The server is a factory function — it returns the configured instance
  * without starting it. The entry point (index.ts) calls listen() separately.
@@ -21,6 +22,8 @@ import { config } from './config';
 import { register_features } from './features';
 import { register_error_handler } from './infrastructure/error_handler';
 import { register_hooks } from './infrastructure/hooks_integration';
+import { load_plugins } from './plugin_loader';
+import { PluginManager } from '@typepress/core';
 
 export async function create_server() {
   const app = Fastify({ logger: true });
@@ -45,15 +48,21 @@ export async function create_server() {
   register_error_handler(app);
   register_hooks(app);
 
+  // --- Features ---
+  await register_features(app);
+
+  // --- Plugins ---
+  const plugin_manager = new PluginManager();
+  await load_plugins(plugin_manager);
+  app.log.info(`Loaded ${plugin_manager.get_all().length} plugins`);
+
   // --- Health check (not a feature — this is infrastructure) ---
   app.get('/health', async () => ({
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    plugins: plugin_manager.get_all().map((p) => `${p.name}@${p.version}`),
   }));
-
-  // --- Features ---
-  await register_features(app);
 
   return app;
 }

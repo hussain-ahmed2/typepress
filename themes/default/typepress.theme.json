@@ -1,0 +1,7 @@
+{
+  "name": "default",
+  "version": "0.1.0",
+  "description": "Clean, minimal blog theme for Typepress",
+  "slots": ["header", "footer", "post_list", "single_post", "sidebar"],
+  "author": "Typepress"
+}

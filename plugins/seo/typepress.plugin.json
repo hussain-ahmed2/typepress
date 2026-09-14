@@ -1,0 +1,7 @@
+{
+  "name": "seo",
+  "version": "0.1.0",
+  "description": "Adds SEO fields to content (meta title, description, OG image)",
+  "slots": ["content_meta"],
+  "author": "Typepress"
+}
