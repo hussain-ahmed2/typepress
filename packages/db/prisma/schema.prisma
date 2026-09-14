@@ -23,17 +23,18 @@ enum ContentStatus {
 }
 
 model User {
-  id             String   @id @default(cuid())
-  email          String   @unique
+  id             String      @id @default(cuid())
+  email          String      @unique
   name           String?
   password_hash  String
-  role           UserRole @default(AUTHOR)
-  capabilities   Json     @default("[]")
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
+  role           UserRole    @default(AUTHOR)
+  capabilities   Json        @default("[]")
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
   contents       Content[]
   media          Media[]
   sessions       Session[]
+  revisions      Revision[]
 }
 
 model Content {
@@ -48,6 +49,7 @@ model Content {
   created_at  DateTime           @default(now())
   updated_at  DateTime           @updatedAt
   taxonomies  TaxonomyRelation[]
+  revisions   Revision[]
 
   @@index([type, status])
   @@index([author_id])
@@ -93,4 +95,41 @@ model Session {
   expires_at  DateTime
 
   @@index([user_id])
+}
+
+model Menu {
+  id         String     @id @default(cuid())
+  name       String
+  slug       String     @unique
+  location   String?    // primary, footer, sidebar
+  items      MenuItem[]
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+}
+
+model MenuItem {
+  id         String     @id @default(cuid())
+  menu_id    String
+  menu       Menu       @relation(fields: [menu_id], references: [id], onDelete: Cascade)
+  label      String
+  url        String
+  target     String?    // _blank, _self
+  parent_id  String?
+  parent     MenuItem?  @relation("MenuItemTree", fields: [parent_id], references: [id])
+  children   MenuItem[] @relation("MenuItemTree")
+  order      Int        @default(0)
+
+  @@index([menu_id])
+}
+
+model Revision {
+  id          String   @id @default(cuid())
+  content_id  String
+  content     Content  @relation(fields: [content_id], references: [id], onDelete: Cascade)
+  data        Json     // Full content snapshot
+  author_id   String
+  author      User     @relation(fields: [author_id], references: [id])
+  created_at  DateTime @default(now())
+
+  @@index([content_id])
 }

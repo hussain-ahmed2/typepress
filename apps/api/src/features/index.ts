@@ -16,15 +16,19 @@ import { auth_feature } from './auth';
 import { content_feature } from './content';
 import { media_feature } from './media';
 import { taxonomy_feature } from './taxonomy';
+import { menu_feature } from './menu';
+import { user_feature } from './user';
+import { revision_feature } from './revision';
 
 const feature_registry = new FeatureRegistry();
 
-// Register features in dependency order.
-// Auth first — other features may depend on session/capability middleware.
 feature_registry.register(auth_feature);
 feature_registry.register(content_feature);
 feature_registry.register(media_feature);
 feature_registry.register(taxonomy_feature);
+feature_registry.register(menu_feature);
+feature_registry.register(user_feature);
+feature_registry.register(revision_feature);
 
 /**
  * Boot all features into the Fastify instance.
