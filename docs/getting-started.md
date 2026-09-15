@@ -61,19 +61,19 @@ pnpm dev
 
 This starts all three apps:
 - **API**: http://localhost:8000
-- **Admin**: http://localhost:4000
-- **Renderer**: http://localhost:4001
+- **Admin**: http://localhost:8001
+- **Renderer**: http://localhost:8002
 
 ## First Login
 
-1. Open http://localhost:4000/login
+1. Open http://localhost:8001/login
 2. Login with:
    - Email: `admin@typepress.dev`
    - Password: `test` (any password works in dev mode)
 
 ## Creating Your First Post
 
-1. Go to http://localhost:4000/content
+1. Go to http://localhost:8001/content
 2. Click "New Content"
 3. Enter a title and slug
 4. Select "Post" as type
@@ -84,7 +84,7 @@ This starts all three apps:
 
 ## Viewing Your Post
 
-1. Go to http://localhost:4001
+1. Go to http://localhost:8002
 2. Your post should appear in the list
 3. Click to view the full post
 
