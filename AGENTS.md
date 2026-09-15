@@ -41,6 +41,28 @@ pnpm test:run       # All 82 tests pass
 - Check the UI matches the design
 - THEN commit
 
+### 6. NEVER Use Emojis — Use Lucide Icons
+```tsx
+// WRONG
+<span>📊</span>
+<span>📝</span>
+<span>🖼️</span>
+
+// CORRECT
+import { LayoutDashboard, FileText, Image } from 'lucide-react';
+<LayoutDashboard size={18} />
+<FileText size={18} />
+<Image size={18} />
+```
+
+**Lucide icons are required for:**
+- Sidebar navigation
+- Button icons
+- Status indicators
+- Any UI element that needs an icon
+
+**Lucide is already installed** — just import from `lucide-react`.
+
 ---
 
 ## Core Principles
