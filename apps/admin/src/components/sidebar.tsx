@@ -17,6 +17,7 @@ import {
   Menu,
   Users,
   Settings,
+  Store,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -35,6 +36,7 @@ const nav_items: NavItem[] = [
   { href: '/menus', label: 'Menus', icon: Menu },
   { href: '/users', label: 'Users', icon: Users },
   { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/marketplace', label: 'Marketplace', icon: Store },
 ];
 
 export function Sidebar() {

@@ -1,0 +1,6 @@
+{
+  "name": "@typepress/theme-landing", "version": "1.0.0", "private": true, "main": "./src/index.tsx", "types": "./src/index.tsx",
+  "scripts": { "build": "tsc" },
+  "dependencies": { "@typepress/theme-sdk": "workspace:*", "@typepress/shared-types": "workspace:*", "react": "^19.0.0" },
+  "devDependencies": { "typescript": "^5.7.2", "@types/react": "^19.0.0" }
+}

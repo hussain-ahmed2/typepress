@@ -1,0 +1,3 @@
+{
+  "name": "ecommerce", "version": "1.0.0", "description": "E-commerce theme with product grid", "slots": ["header", "footer", "post_list", "single_post"], "author": "Typepress"
+}

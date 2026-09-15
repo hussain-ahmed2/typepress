@@ -505,6 +505,25 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  themes/blog:
+    dependencies:
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+      '@typepress/theme-sdk':
+        specifier: workspace:*
+        version: link:../../packages/theme-sdk
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   themes/business:
     dependencies:
       '@typepress/shared-types':
@@ -525,6 +544,82 @@ importers:
         version: 5.9.3
 
   themes/default:
+    dependencies:
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+      '@typepress/theme-sdk':
+        specifier: workspace:*
+        version: link:../../packages/theme-sdk
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  themes/ecommerce:
+    dependencies:
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+      '@typepress/theme-sdk':
+        specifier: workspace:*
+        version: link:../../packages/theme-sdk
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  themes/landing:
+    dependencies:
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+      '@typepress/theme-sdk':
+        specifier: workspace:*
+        version: link:../../packages/theme-sdk
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  themes/magazine:
+    dependencies:
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+      '@typepress/theme-sdk':
+        specifier: workspace:*
+        version: link:../../packages/theme-sdk
+      react:
+        specifier: ^19.0.0
+        version: 19.3.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.3.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  themes/portfolio:
     dependencies:
       '@typepress/shared-types':
         specifier: workspace:*

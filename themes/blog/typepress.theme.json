@@ -1,0 +1,3 @@
+{
+  "name": "blog", "version": "1.0.0", "description": "Clean blog theme with sidebar", "slots": ["header", "footer", "post_list", "single_post", "sidebar"], "author": "Typepress"
+}
