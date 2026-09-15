@@ -5,6 +5,7 @@
  * Tests verify login flow, user lookup, and error handling.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import bcrypt from 'bcrypt';
 
 vi.mock('@typepress/db', () => ({
   prisma: {
@@ -23,12 +24,17 @@ const mock_user = prisma as unknown as {
   };
 };
 
+// Pre-hash a test password for tests
+const TEST_PASSWORD = 'TestPassword123';
+let TEST_PASSWORD_HASH: string;
+
 describe('AuthService', () => {
   let service: AuthService;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
     service = new AuthService();
+    TEST_PASSWORD_HASH = await bcrypt.hash(TEST_PASSWORD, 10);
   });
 
   describe('login', () => {
@@ -38,10 +44,10 @@ describe('AuthService', () => {
         email: 'admin@typepress.dev',
         name: 'Admin',
         role: 'ADMIN',
-        password_hash: 'hash',
+        password_hash: TEST_PASSWORD_HASH,
       });
 
-      const result = await service.login('admin@typepress.dev', 'password');
+      const result = await service.login('admin@typepress.dev', TEST_PASSWORD);
 
       expect(result.success).toBe(true);
       expect(result.data?.user_id).toBe('1');

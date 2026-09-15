@@ -1,21 +1,18 @@
 /**
- * Validation Middleware — Zod-based request validation for Fastify.
+ * Validation Middleware — Zod v4-based request validation for Fastify.
  *
  * Validates request body, query parameters, or path parameters against
  * Zod schemas before handlers execute. On failure, returns structured
  * 400 errors with field-level details.
- *
- * Usage in routes:
- *   app.post('/content', {
- *     preHandler: [validate_body(create_content_schema)],
- *   }, handler);
  */
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import type { ZodSchema, ZodError } from 'zod';
+import type { ZodSchema } from 'zod';
 
-/** Convert Zod errors into a human-readable array of field/message pairs. */
-function format_zod_error(error: ZodError) {
-  return error.errors.map((e) => ({
+/** Convert Zod v4 errors into a human-readable array of field/message pairs. */
+function format_zod_error(error: unknown) {
+  const zod_error = error as { issues?: Array<{ path: (string | number)[]; message: string }> };
+  if (!zod_error.issues) return [];
+  return zod_error.issues.map((e) => ({
     field: e.path.join('.'),
     message: e.message,
   }));
@@ -23,8 +20,6 @@ function format_zod_error(error: ZodError) {
 
 /**
  * Creates a preHandler that validates request.body against a Zod schema.
- * On success, replaces body with the parsed/coerced value.
- * On failure, returns 400 with validation error details.
  */
 export function validate_body(schema: ZodSchema) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -47,7 +42,6 @@ export function validate_body(schema: ZodSchema) {
 
 /**
  * Creates a preHandler that validates request.query against a Zod schema.
- * Useful for pagination, filtering, and sort parameters.
  */
 export function validate_query(schema: ZodSchema) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
@@ -70,7 +64,6 @@ export function validate_query(schema: ZodSchema) {
 
 /**
  * Creates a preHandler that validates request.params against a Zod schema.
- * Useful for validating :id, :slug, and other path parameters.
  */
 export function validate_params(schema: ZodSchema) {
   return async (request: FastifyRequest, reply: FastifyReply) => {
