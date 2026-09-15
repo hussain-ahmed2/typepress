@@ -1,11 +1,5 @@
 /**
  * API Client — Axios-based typed fetch wrapper for the Typepress API.
- *
- * Features:
- *   - Automatic session cookie handling
- *   - Request/response interceptors
- *   - Typed responses matching ApiResponse<T>
- *   - Error handling with retry logic
  */
 import axios, { type AxiosInstance, type AxiosError } from 'axios';
 import type { ApiResponse } from '@typepress/shared-types';
@@ -19,7 +13,6 @@ const axios_instance: AxiosInstance = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Auto-redirect to login on 401
 axios_instance.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
@@ -32,7 +25,8 @@ axios_instance.interceptors.response.use(
   },
 );
 
-function handle_error(error: unknown): ApiResponse {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function handle_error(error: unknown): ApiResponse<any> {
   const axios_error = error as AxiosError<{ error?: { code?: string; message?: string } }>;
   if (axios_error.response?.data?.error) {
     return { success: false, error: axios_error.response.data.error as { code: string; message: string } };
@@ -40,20 +34,21 @@ function handle_error(error: unknown): ApiResponse {
   return { success: false, error: { code: 'NETWORK_ERROR', message: axios_error.message || 'Network error' } };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const api = {
-  get: async <T>(path: string): Promise<ApiResponse<T>> => {
+  get: async <T = any>(path: string): Promise<ApiResponse<T>> => {
     try { return (await axios_instance.get<ApiResponse<T>>(path)).data; }
     catch (e) { return handle_error(e); }
   },
-  post: async <T>(path: string, body?: unknown): Promise<ApiResponse<T>> => {
+  post: async <T = any>(path: string, body?: unknown): Promise<ApiResponse<T>> => {
     try { return (await axios_instance.post<ApiResponse<T>>(path, body)).data; }
     catch (e) { return handle_error(e); }
   },
-  put: async <T>(path: string, body?: unknown): Promise<ApiResponse<T>> => {
+  put: async <T = any>(path: string, body?: unknown): Promise<ApiResponse<T>> => {
     try { return (await axios_instance.put<ApiResponse<T>>(path, body)).data; }
     catch (e) { return handle_error(e); }
   },
-  delete: async <T>(path: string): Promise<ApiResponse<T>> => {
+  delete: async <T = any>(path: string): Promise<ApiResponse<T>> => {
     try { return (await axios_instance.delete<ApiResponse<T>>(path)).data; }
     catch (e) { return handle_error(e); }
   },
