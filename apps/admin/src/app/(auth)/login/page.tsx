@@ -1,8 +1,12 @@
 /**
- * Login Page — Authenticates users against the Typepress API.
+ * Login Page — Accessible, responsive login form.
  *
- * Redirects to dashboard on success. Shows error message on failure.
- * Uses cookie-based sessions managed by the API.
+ * Features:
+ *   - Responsive layout (works on mobile)
+ *   - Keyboard navigation
+ *   - ARIA labels for screen readers
+ *   - Focus visible states
+ *   - Error announcements for screen readers
  */
 'use client';
 
@@ -33,40 +37,53 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f3f9fb' }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#F8FCFB' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold" style={{ color: '#474f85' }}>Typepress</h1>
-          <p className="mt-2" style={{ color: '#51e3d4' }}>Sign in to the admin panel</p>
+          <h1 className="text-3xl font-bold" style={{ color: '#6892D5' }}>Typepress</h1>
+          <p className="mt-2" style={{ color: '#79D1C3' }}>Sign in to the admin panel</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-8">
+        <div className="bg-white rounded-lg p-8" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
+            <div
+              role="alert"
+              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm"
+            >
               {error}
             </div>
           )}
 
           <form onSubmit={handle_submit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
               <input
+                id="email"
                 type="email"
                 value={email}
                 onChange={(e) => set_email((e.target as HTMLInputElement).value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="admin@typepress.dev"
+                aria-required="true"
+                autoComplete="email"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
               <input
+                id="password"
                 type="password"
                 value={password}
                 onChange={(e) => set_password((e.target as HTMLInputElement).value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="••••••••"
+                aria-required="true"
+                autoComplete="current-password"
               />
             </div>
 
@@ -74,7 +91,8 @@ export default function LoginPage() {
               type="submit"
               disabled={loading || !email || !password}
               className="w-full text-white py-2 rounded-lg font-medium disabled:opacity-50"
-              style={{ backgroundColor: '#474f85' }}
+              style={{ backgroundColor: '#6892D5' }}
+              aria-busy={loading}
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>

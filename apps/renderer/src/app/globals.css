@@ -1,12 +1,30 @@
 @import "tailwindcss";
 
 :root {
-  --color-primary: #474f85;
-  --color-accent: #51e3d4;
-  --color-bg: #f3f9fb;
-  --color-cream: #f3ecd3;
+  --color-primary: #6892D5;
+  --color-accent: #79D1C3;
+  --color-bg: #F8FCFB;
+  --color-light-green: #C9FDD7;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 6px 10px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --radius: 8px;
 }
 
 body {
   background-color: var(--color-bg);
+}
+
+/* Accessibility: Focus visible styles */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Responsive container */
+@media (max-width: 640px) {
+  .container-responsive {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
