@@ -9,8 +9,9 @@
  *   5. Register all features
  *   6. Load plugins
  *   7. Register GraphQL
- *   8. Initialize Socket.IO
- *   9. Health endpoint
+ *   8. Initialize Socket.IO, Scheduler, Email
+ *   9. RSS, Sitemap, Export/Import routes
+ *  10. Health endpoint
  */
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
@@ -29,6 +30,9 @@ import { create_socket_server } from './realtime/socket';
 import { scheduler } from './infrastructure/scheduler';
 import { rss_generator } from './infrastructure/rss';
 import { sitemap_generator } from './infrastructure/sitemap';
+import { export_import_service } from './infrastructure/export_import';
+import { email_service } from './infrastructure/email_service';
+import { require_auth } from './infrastructure/middleware';
 
 export async function create_server() {
   const app = Fastify({ logger: true });
@@ -49,10 +53,8 @@ export async function create_server() {
     },
   });
 
-  // Security: rate limiting, headers, compression
   await register_rate_limiting(app);
   await register_security(app);
-
   register_error_handler(app);
   register_hooks(app);
 
@@ -87,6 +89,24 @@ export async function create_server() {
     return reply.send(xml);
   });
 
+  // --- Export/Import ---
+  app.get('/api/export', {
+    preHandler: [require_auth],
+  }, async (_request, reply) => {
+    const result = await export_import_service.export_all();
+    reply.header('Content-Type', 'application/json');
+    reply.header('Content-Disposition', 'attachment; filename="typepress-export.json"');
+    return reply.send(result.data);
+  });
+
+  app.post('/api/import', {
+    preHandler: [require_auth],
+  }, async (request, reply) => {
+    const data = request.body as { version: string; exported_at: string; content: unknown[]; taxonomies: unknown[] };
+    const result = await export_import_service.import_data(data);
+    return reply.send(result);
+  });
+
   // --- Health check ---
   app.get('/health', async () => ({
     status: 'ok',
@@ -105,4 +125,5 @@ export async function start_server() {
   console.log(`API server running on http://${config.API_HOST}:${config.API_PORT}`);
   create_socket_server(app.server);
   scheduler.start();
+  email_service.init();
 }

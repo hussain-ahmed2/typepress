@@ -28,12 +28,15 @@
     "graphql": "^17.0.2",
     "graphql-yoga": "^5.23.0",
     "ioredis": "^6.0.0",
+    "nodemailer": "^10.0.10",
+    "sharp": "^0.35.4",
     "socket.io": "^4.8.3",
     "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
     "@types/node": "^22.0.0",
+    "@types/nodemailer": "^8.0.1",
     "tsx": "^4.19.0",
     "typescript": "^5.7.2"
   }
