@@ -12,6 +12,9 @@
  */
 import { Server as SocketIOServer } from 'socket.io';
 import type { Server } from 'http';
+import { create_logger } from '../infrastructure/logger';
+
+const log = create_logger('Socket');
 
 interface EditorPresence {
   user_id: string;
@@ -48,7 +51,7 @@ export function create_socket_server(http_server: Server): SocketIOServer {
   });
 
   io.on('connection', (socket) => {
-    console.log(`[Socket] Client connected: ${socket.id}`);
+    log.info(` Client connected: ${socket.id}`);
 
     // Join an editing room for a specific content item
     socket.on('join:editing', (data: { content_id: string; user_id: string; user_name: string }) => {
@@ -80,7 +83,7 @@ export function create_socket_server(http_server: Server): SocketIOServer {
       }
 
       io.to(room).emit('presence:update', presences);
-      console.log(`[Socket] ${data.user_name} joined room ${room} (${presences.length} editors)`);
+      log.info(` ${data.user_name} joined room ${room} (${presences.length} editors)`);
     });
 
     // Broadcast cursor position
@@ -123,7 +126,7 @@ export function create_socket_server(http_server: Server): SocketIOServer {
         }
 
         io.to(room).emit('presence:update', presences);
-        console.log(`[Socket] ${presence.user_name} left room ${room} (${presences.length} editors)`);
+        log.info(` ${presence.user_name} left room ${room} (${presences.length} editors)`);
       }
     });
   });

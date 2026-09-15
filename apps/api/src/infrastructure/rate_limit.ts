@@ -1,3 +1,5 @@
+import { create_logger } from "./logger";
+const log = create_logger("Security");
 /**
  * Rate Limiting — Configurable rate limits for API endpoints.
  *
@@ -32,5 +34,5 @@ export async function register_rate_limiting(app: FastifyInstance): Promise<void
     }
   });
 
-  console.log('[Security] Rate limiting enabled');
+  log.info("Rate limiting enabled");
 }

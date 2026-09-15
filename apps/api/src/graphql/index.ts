@@ -1,3 +1,5 @@
+import { create_logger } from "../infrastructure/logger";
+const log = create_logger("GraphQL");
 /**
  * GraphQL Server — Integrates GraphQL Yoga with Fastify.
  *
@@ -40,5 +42,5 @@ export async function register_graphql(app: FastifyInstance): Promise<void> {
     return reply.send(body);
   });
 
-  console.log('[GraphQL] Registered at /api/graphql');
+  log.info('Registered at /api/graphql');
 }

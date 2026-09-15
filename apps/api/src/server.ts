@@ -122,7 +122,7 @@ export async function create_server() {
 export async function start_server() {
   const app = await create_server();
   await app.listen({ port: config.API_PORT, host: config.API_HOST });
-  console.log(`API server running on http://${config.API_HOST}:${config.API_PORT}`);
+  app.log.info(`API server running on http://${config.API_HOST}:${config.API_PORT}`);
   create_socket_server(app.server);
   scheduler.start();
   email_service.init();

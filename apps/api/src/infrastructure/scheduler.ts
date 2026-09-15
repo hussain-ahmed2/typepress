@@ -1,3 +1,5 @@
+import { create_logger } from "./logger";
+const log = create_logger("Scheduler");
 import { prisma } from '@typepress/db';
 
 /**
@@ -10,7 +12,7 @@ export class Scheduler {
   private interval: ReturnType<typeof setInterval> | null = null;
 
   start(interval_ms = 60000): void {
-    console.log(`[Scheduler] Started (checking every ${interval_ms / 1000}s)`);
+    log.info(` Started (checking every ${interval_ms / 1000}s)`);
     this.interval = setInterval(() => this.check_scheduled(), interval_ms);
     // Run immediately on start
     this.check_scheduled();
@@ -38,14 +40,14 @@ export class Scheduler {
 
       if (to_publish.length === 0) return;
 
-      console.log(`[Scheduler] Publishing ${to_publish.length} scheduled post(s)`);
+      log.info(` Publishing ${to_publish.length} scheduled post(s)`);
 
       for (const content of to_publish) {
         await prisma.content.update({
           where: { id: content.id },
           data: { status: 'PUBLISHED' },
         });
-        console.log(`[Scheduler] Published: "${content.title}" (${content.id})`);
+        log.info(` Published: "${content.title}" (${content.id})`);
       }
     } catch (error) {
       console.error('[Scheduler] Error checking scheduled content:', error);

@@ -1,3 +1,5 @@
+import { create_logger } from "./infrastructure/logger";
+const log = create_logger("PluginLoader");
 /**
  * Plugin Loader — Discovers and loads plugins from the plugins/ directory.
  *
@@ -37,7 +39,7 @@ export async function load_plugins(plugin_manager: PluginManager): Promise<void>
         const manifest_raw = await import(manifest_path);
         const manifest = manifest_raw.default ?? manifest_raw;
 
-        console.log(`[PluginLoader] Found plugin: ${manifest.name} v${manifest.version}`);
+        log.info(` Found plugin: ${manifest.name} v${manifest.version}`);
 
         // For now, plugins are loaded as in-process modules
         // Future: worker-thread isolation for untrusted plugins
@@ -45,14 +47,14 @@ export async function load_plugins(plugin_manager: PluginManager): Promise<void>
           name: manifest.name,
           version: manifest.version,
           register: async () => {
-            console.log(`[PluginLoader] Registered plugin: ${manifest.name}`);
+            log.info(` Registered plugin: ${manifest.name}`);
             // Plugin registration happens via hooks system
           },
         };
 
         await plugin_manager.load(plugin);
       } catch (error) {
-        console.error(`[PluginLoader] Failed to load plugin "${entry.name}":`, error);
+        log.error(` Failed to load plugin "${entry.name}":`, error);
       }
     }
   } catch (error) {

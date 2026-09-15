@@ -1,3 +1,5 @@
+import { create_logger } from "./logger";
+const log = create_logger("Security");
 /**
  * Security Middleware — Security headers and protections.
  *
@@ -24,5 +26,5 @@ export async function register_security(app: FastifyInstance): Promise<void> {
     threshold: 1024, // Only compress responses > 1KB
   });
 
-  console.log('[Security] Security headers and compression enabled');
+  log.info("Security headers and compression enabled");
 }

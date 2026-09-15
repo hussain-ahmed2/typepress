@@ -1,3 +1,5 @@
+import { create_logger } from "./logger";
+const log = create_logger("Email");
 /**
  * Email Service — Email notifications for Typepress events.
  *
@@ -55,7 +57,7 @@ export class EmailService {
    */
   async send(options: EmailOptions): Promise<boolean> {
     if (!this.transporter) {
-      console.log(`[Email] Would send to ${options.to}: ${options.subject}`);
+      log.info(` Would send to ${options.to}: ${options.subject}`);
       return true;
     }
 
