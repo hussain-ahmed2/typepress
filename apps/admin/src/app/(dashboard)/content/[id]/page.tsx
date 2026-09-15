@@ -62,14 +62,14 @@ export default function ContentEditorPage() {
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Title</label>
           <input type="text" value={title} onChange={(e) => set_title(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-[#2185d5] focus:outline-none"
             placeholder="Enter title..." />
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Slug</label>
           <input type="text" value={slug} onChange={(e) => set_slug(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-[#2185d5] focus:outline-none"
             placeholder="auto-generated-from-title" />
         </div>
 
@@ -77,7 +77,7 @@ export default function ContentEditorPage() {
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Type</label>
             <select value={type} onChange={(e) => set_type(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]">
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-[#2185d5] focus:outline-none">
               <option value="post">Post</option>
               <option value="page">Page</option>
             </select>
@@ -85,7 +85,7 @@ export default function ContentEditorPage() {
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Status</label>
             <select value={status} onChange={(e) => set_status(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]">
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-[#2185d5] focus:outline-none">
               <option value="DRAFT">Draft</option>
               <option value="PUBLISHED">Published</option>
             </select>
@@ -95,7 +95,7 @@ export default function ContentEditorPage() {
         <div>
           <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Excerpt</label>
           <textarea value={meta_excerpt} onChange={(e) => set_meta_excerpt(e.target.value)} rows={3}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-[#2185d5] focus:outline-none"
             placeholder="Optional summary..." />
         </div>
 

@@ -34,17 +34,17 @@ export default function SettingsPage() {
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Site Title</label>
               <input type="text" value={site_title} onChange={(e) => set_site_title(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]" />
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-[#2185d5] focus:outline-none" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Site Description</label>
               <input type="text" value={site_description} onChange={(e) => set_site_description(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]" />
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-[#2185d5] focus:outline-none" />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Site URL</label>
               <input type="url" value={site_url} onChange={(e) => set_site_url(e.target.value)}
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]" />
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-[#2185d5] focus:outline-none" />
             </div>
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function SettingsPage() {
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Admin Email</label>
             <input type="email" value={admin_email} onChange={(e) => set_admin_email(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]" />
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-[#2185d5] focus:outline-none" />
           </div>
         </div>
 
