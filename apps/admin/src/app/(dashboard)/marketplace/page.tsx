@@ -81,7 +81,7 @@ export default function MarketplacePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((item) => (
-          <div key={item.name} className="bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow">
+          <div key={item.name} className="bg-white rounded-lg drop-shadow p-4 hover:drop-shadow-md transition-drop-shadow">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 {item.type === 'plugin' ? <Package size={24} className="text-blue-500" /> : <Palette size={24} className="text-purple-500" />}

@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
 
-        <header className="py-4 shadow-md" style={{ backgroundColor: '#0284C7' }} role="banner">
+        <header className="py-4 drop-shadow-md" style={{ backgroundColor: '#303841' }} role="banner">
           <div className="max-w-4xl mx-auto px-4">
             <a href="/" className="text-xl font-bold text-white">Typepress</a>
           </div>

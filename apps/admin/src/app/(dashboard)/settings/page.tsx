@@ -25,7 +25,7 @@ export default function SettingsPage() {
 
       <div className="space-y-6">
         {/* General Settings */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg drop-shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <Globe size={20} className="text-gray-500" />
             <h2 className="text-lg font-semibold">General</h2>
@@ -65,7 +65,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Email Settings */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg drop-shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <Mail size={20} className="text-gray-500" />
             <h2 className="text-lg font-semibold">Email</h2>
@@ -113,7 +113,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Security Settings */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg drop-shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <Shield size={20} className="text-gray-500" />
             <h2 className="text-lg font-semibold">Security</h2>

@@ -32,11 +32,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#F0F9FF' }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f3f3f3' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold" style={{ color: '#0284C7' }}>Typepress</h1>
-          <p className="mt-2" style={{ color: '#0284C7' }}>Sign in to the admin panel</p>
+          <h1 className="text-3xl font-bold" style={{ color: '#2185d5' }}>Typepress</h1>
+          <p className="mt-2" style={{ color: '#3a4750' }}>Sign in to the admin panel</p>
         </div>
 
         <div className="bg-white rounded-md p-8 drop-shadow-md">

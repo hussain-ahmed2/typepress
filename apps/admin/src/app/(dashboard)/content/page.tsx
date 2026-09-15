@@ -44,7 +44,7 @@ export default function ContentListPage() {
   return (
     <div className="px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Content</h1>
+        <h1 className="text-2xl font-bold" style={{ color: '#303841' }}>Content</h1>
         <Link
           href="/content/new"
           className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium text-white"

@@ -78,7 +78,7 @@ export default function MenusPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Menu List */}
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-white rounded-lg drop-shadow p-4">
           <h2 className="text-lg font-semibold mb-4">All Menus</h2>
           <div className="space-y-2 mb-4">
             {menus.map((menu) => (
@@ -115,7 +115,7 @@ export default function MenusPage() {
         </div>
 
         {/* Menu Items */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow p-4">
+        <div className="lg:col-span-2 bg-white rounded-lg drop-shadow p-4">
           {selected_menu ? (
             <>
               <div className="flex items-center justify-between mb-4">

@@ -68,7 +68,7 @@ export default function TaxonomyPage() {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Taxonomy</h1>
 
       {/* Create form */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
+      <div className="bg-white rounded-lg drop-shadow p-6 mb-6">
         <h2 className="text-lg font-medium text-gray-900 mb-4">Add Taxonomy</h2>
         <div className="flex gap-3 items-end">
           <div className="flex-1">
@@ -116,11 +116,11 @@ export default function TaxonomyPage() {
       {loading ? (
         <p className="text-gray-500">Loading...</p>
       ) : taxonomies.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
+        <div className="bg-white rounded-lg drop-shadow p-8 text-center">
           <p className="text-gray-500">No taxonomies yet.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-lg drop-shadow overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
