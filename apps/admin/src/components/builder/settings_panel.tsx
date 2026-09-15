@@ -1,7 +1,7 @@
 /**
  * Settings Panel — Property editor for the selected block.
  *
- * Accessible, keyboard-navigable, with proper labels.
+ * Clean, minimal design like Gutenberg.
  */
 'use client';
 
@@ -19,43 +19,44 @@ export function SettingsPanel({ block, onUpdate, onDelete }: SettingsPanelProps)
   const block_type = block_types.find((b) => b.type === block.type);
 
   return (
-    <div className="bg-white rounded-md drop-shadow p-4">
+    <div>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold" style={{ color: '#303841' }}>
-          {block_type?.label || block.type}
-        </h3>
-        <button onClick={onDelete} className="p-1 hover:opacity-80" style={{ color: '#ef4444' }} aria-label="Delete block">
+        <span className="text-xs font-medium text-gray-500 uppercase">{block_type?.label || block.type}</span>
+        <button onClick={onDelete} className="p-1 hover:bg-red-50 rounded text-gray-400 hover:text-red-500 transition-colors" title="Delete">
           <Trash2 size={14} />
         </button>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {block_type?.settings.map((setting) => (
           <div key={setting.key}>
-            <label htmlFor={`prop-${setting.key}`} className="block text-xs font-medium mb-1" style={{ color: '#3a4750' }}>
-              {setting.label}
-            </label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">{setting.label}</label>
             {setting.type === 'color' ? (
-              <input id={`prop-${setting.key}`} type="color" value={String(block.props[setting.key] || '#000000')}
-                onChange={(e) => onUpdate({ [setting.key]: e.target.value })}
-                className="w-full h-8 rounded-md border border-gray-300" />
+              <div className="flex items-center gap-2">
+                <input type="color" value={String(block.props[setting.key] || '#000000')}
+                  onChange={(e) => onUpdate({ [setting.key]: e.target.value })}
+                  className="w-8 h-8 rounded border border-gray-200 cursor-pointer" />
+                <input type="text" value={String(block.props[setting.key] || '')}
+                  onChange={(e) => onUpdate({ [setting.key]: e.target.value })}
+                  className="flex-1 border border-gray-200 rounded px-2 py-1 text-sm" />
+              </div>
             ) : setting.type === 'number' ? (
-              <input id={`prop-${setting.key}`} type="range" min={setting.min || 0} max={setting.max || 100}
+              <input type="range" min={setting.min || 0} max={setting.max || 100}
                 value={Number(block.props[setting.key] || 0)}
                 onChange={(e) => onUpdate({ [setting.key]: Number(e.target.value) })}
                 className="w-full" />
             ) : setting.type === 'select' ? (
-              <select id={`prop-${setting.key}`} value={String(block.props[setting.key] || '')}
+              <select value={String(block.props[setting.key] || '')}
                 onChange={(e) => onUpdate({ [setting.key]: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:border-[#2185d5] focus:outline-none">
+                className="w-full border border-gray-200 rounded px-2 py-1 text-sm">
                 {setting.options?.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
               </select>
             ) : (
-              <input id={`prop-${setting.key}`} type="text" value={String(block.props[setting.key] || '')}
+              <input type="text" value={String(block.props[setting.key] || '')}
                 onChange={(e) => onUpdate({ [setting.key]: e.target.value })}
-                className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:border-[#2185d5] focus:outline-none" />
+                className="w-full border border-gray-200 rounded px-2 py-1 text-sm" />
             )}
           </div>
         ))}

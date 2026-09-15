@@ -1,5 +1,7 @@
 /**
  * Block Renderer — Renders blocks based on their type and props.
+ *
+ * Clean, minimal rendering like Gutenberg.
  */
 'use client';
 
@@ -11,9 +13,9 @@ export function BlockRenderer({ block }: { block: Block }) {
   switch (type) {
     case 'heading':
       return (
-        <h2 style={{
+        <h2 className="font-bold" style={{
           fontSize: `${props.fontSize || 32}px`,
-          color: String(props.color || '#1E293B'),
+          color: String(props.color || '#1e293b'),
           textAlign: (props.textAlign || 'left') as 'left' | 'center' | 'right',
         }}>
           {String(props.text || 'Heading')}
@@ -22,9 +24,9 @@ export function BlockRenderer({ block }: { block: Block }) {
 
     case 'text':
       return (
-        <p style={{
+        <p className="leading-relaxed" style={{
           fontSize: `${props.fontSize || 16}px`,
-          color: String(props.color || '#64748B'),
+          color: String(props.color || '#475569'),
           textAlign: (props.textAlign || 'left') as 'left' | 'center' | 'right',
         }}>
           {String(props.text || 'Text')}
@@ -33,56 +35,33 @@ export function BlockRenderer({ block }: { block: Block }) {
 
     case 'image':
       return props.src ? (
-        <img
-          src={String(props.src)}
-          alt={String(props.alt || '')}
-          style={{ width: String(props.width || '100%'), borderRadius: '6px' }}
-        />
+        <img src={String(props.src)} alt={String(props.alt || '')} style={{ width: String(props.width || '100%') }} className="rounded-md" />
       ) : (
-        <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-md p-8 text-center" style={{ color: '#3a4750' }}>
-          Image placeholder
+        <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-md p-12 text-center text-gray-400">
+          Click to add image
         </div>
       );
 
     case 'button':
       return (
-        <button
-          style={{
-            backgroundColor: String(props.color || '#2185d5'),
-            color: '#ffffff',
-            padding: '10px 24px',
-            borderRadius: `${props.borderRadius || 6}px`,
-            border: 'none',
-            fontWeight: 'bold',
-          }}
-        >
+        <button className="px-6 py-2.5 rounded-md font-medium text-white transition-colors hover:opacity-90" style={{ backgroundColor: String(props.color || '#2563eb') }}>
           {String(props.text || 'Button')}
         </button>
       );
 
     case 'divider':
       return (
-        <hr style={{
-          border: 'none',
-          borderTop: `${props.thickness || 1}px ${props.style || 'solid'} ${props.color || '#e5e7eb'}`,
-          margin: `${props.margin || 16}px 0`,
-        }} />
+        <hr className="my-4" style={{ border: 'none', borderTop: `${props.thickness || 1}px ${props.style || 'solid'} ${props.color || '#e2e8f0'}` }} />
       );
 
     case 'container':
       return (
-        <div style={{
-          background: String(props.background || '#f9fafb'),
-          padding: `${props.padding || 16}px`,
-          borderRadius: '6px',
-          minHeight: '40px',
-          border: '1px dashed #d1d5db',
-        }}>
-          <p style={{ color: '#3a4750', textAlign: 'center', fontSize: '12px' }}>Container</p>
+        <div style={{ background: String(props.background || '#f8fafc'), padding: `${props.padding || 16}px`, minHeight: '60px' }} className="rounded-md border border-dashed border-gray-300">
+          <p className="text-gray-400 text-sm text-center">Container</p>
         </div>
       );
 
     default:
-      return <div style={{ color: '#3a4750' }}>Unknown: {type}</div>;
+      return <div className="text-gray-400">Unknown: {type}</div>;
   }
 }

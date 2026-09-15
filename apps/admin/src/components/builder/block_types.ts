@@ -1,12 +1,5 @@
 /**
  * Block Types — Defines all available blocks for the page builder.
- *
- * Each block has:
- *   - type: unique identifier
- *   - label: display name
- *   - icon: Lucide icon component
- *   - defaultProps: default values for new instances
- *   - settings: list of editable properties
  */
 import type { LucideIcon } from 'lucide-react';
 import { Type, Heading1, Image, MousePointerClick, Minus, Container } from 'lucide-react';
@@ -33,7 +26,7 @@ export const block_types: BlockType[] = [
     type: 'heading',
     label: 'Heading',
     icon: Heading1,
-    defaultProps: { text: 'Heading', fontSize: 32, color: '#1E293B', textAlign: 'left' },
+    defaultProps: { text: 'Heading', fontSize: 32, color: '#1e293b', textAlign: 'left' },
     settings: [
       { key: 'text', label: 'Text', type: 'text' },
       { key: 'fontSize', label: 'Font Size', type: 'number', min: 12, max: 96 },
@@ -49,7 +42,7 @@ export const block_types: BlockType[] = [
     type: 'text',
     label: 'Text',
     icon: Type,
-    defaultProps: { text: 'Text content', fontSize: 16, color: '#64748B', textAlign: 'left' },
+    defaultProps: { text: 'Text content', fontSize: 16, color: '#475569', textAlign: 'left' },
     settings: [
       { key: 'text', label: 'Text', type: 'text' },
       { key: 'fontSize', label: 'Font Size', type: 'number', min: 12, max: 72 },
@@ -76,7 +69,7 @@ export const block_types: BlockType[] = [
     type: 'button',
     label: 'Button',
     icon: MousePointerClick,
-    defaultProps: { text: 'Button', color: '#2185d5', borderRadius: 6, link: '' },
+    defaultProps: { text: 'Button', color: '#2563eb', borderRadius: 6, link: '' },
     settings: [
       { key: 'text', label: 'Text', type: 'text' },
       { key: 'color', label: 'Color', type: 'color' },
@@ -88,7 +81,7 @@ export const block_types: BlockType[] = [
     type: 'divider',
     label: 'Divider',
     icon: Minus,
-    defaultProps: { style: 'solid', color: '#e5e7eb', thickness: 1, margin: 16 },
+    defaultProps: { style: 'solid', color: '#e2e8f0', thickness: 1, margin: 16 },
     settings: [
       { key: 'style', label: 'Style', type: 'select', options: [
         { value: 'solid', label: 'Solid' },
@@ -104,7 +97,7 @@ export const block_types: BlockType[] = [
     type: 'container',
     label: 'Container',
     icon: Container,
-    defaultProps: { background: '#f9fafb', padding: 16 },
+    defaultProps: { background: '#f8fafc', padding: 16 },
     settings: [
       { key: 'background', label: 'Background', type: 'color' },
       { key: 'padding', label: 'Padding', type: 'number', min: 0, max: 100 },
