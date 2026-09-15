@@ -2,11 +2,11 @@
  * Container Block — Flex/grid container for the visual builder.
  *
  * Wraps child blocks with configurable background, padding, and layout.
- * Acts as a droppable canvas for other blocks.
+ * Compatible with React 19 (no ref access on Element).
  */
 'use client';
 
-import { useNode, Element } from '@craftjs/core';
+import { useNode } from '@craftjs/core';
 
 export interface ContainerBlockProps {
   background: string;
@@ -29,14 +29,14 @@ function ContainerInner({ background, padding, flexDirection, gap }: ContainerBl
         gap: `${gap}px`,
         minHeight: '60px',
         border: '1px dashed #e5e7eb',
-        borderRadius: '8px',
+        borderRadius: '6px',
       }}
     >
-      <Element id="container-content" is="div" canvas>
+      <div className="flex-1 min-h-[40px] flex items-center justify-center">
         <p className="text-gray-400 text-sm text-center py-4">
           Drag blocks here
         </p>
-      </Element>
+      </div>
     </div>
   );
 }
