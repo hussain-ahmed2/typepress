@@ -1,0 +1,6 @@
+{
+  "name": "cart",
+  "version": "1.0.0",
+  "description": "Shopping cart with session persistence",
+  "author": "Typepress"
+}

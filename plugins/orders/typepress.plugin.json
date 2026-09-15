@@ -1,0 +1,7 @@
+{
+  "name": "orders",
+  "version": "1.0.0",
+  "description": "Order management and fulfillment",
+  "slots": ["order_list", "order_detail"],
+  "author": "Typepress"
+}
