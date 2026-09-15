@@ -1,12 +1,7 @@
 /**
  * Sidebar Component — Responsive, accessible navigation.
  *
- * Features:
- *   - Collapsible on mobile with hamburger toggle
- *   - Keyboard navigation support
- *   - ARIA labels for screen readers
- *   - Focus visible states
- *   - Drop shadow styling
+ * Color scheme: Sky blue primary (#0284C7)
  */
 'use client';
 
@@ -51,29 +46,27 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile hamburger button */}
       <button
         onClick={() => set_isOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg text-white"
-        style={{ backgroundColor: '#6892D5' }}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg text-white shadow-md"
+        style={{ backgroundColor: '#0284C7' }}
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      {/* Sidebar */}
       <aside
         className={`fixed lg:static inset-y-0 left-0 z-40 w-64 text-white min-h-screen p-4 transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
-        style={{ backgroundColor: '#6892D5' }}
+        style={{ backgroundColor: '#0284C7' }}
         role="navigation"
         aria-label="Main navigation"
       >
         <div className="mb-8">
           <h1 className="text-xl font-bold">Typepress</h1>
-          <p className="text-sm" style={{ color: '#C9FDD7' }}>Admin Panel</p>
+          <p className="text-sm text-sky-200">Admin Panel</p>
         </div>
 
         <nav className="space-y-1">
@@ -92,7 +85,7 @@ export function Sidebar() {
                     ? 'text-white shadow-md'
                     : 'text-white/70 hover:text-white hover:shadow-sm'
                 }`}
-                style={is_active ? { backgroundColor: '#79D1C3' } : {}}
+                style={is_active ? { backgroundColor: '#10B981' } : {}}
                 aria-current={is_active ? 'page' : undefined}
               >
                 <Icon size={18} aria-hidden="true" />
@@ -103,7 +96,6 @@ export function Sidebar() {
         </nav>
       </aside>
 
-      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
