@@ -30,7 +30,7 @@ export function Toolbox() {
   const { connectors } = useEditor();
 
   return (
-    <div className="bg-white rounded-lg shadow p-4">
+    <div className="bg-white rounded-md drop-shadow p-4">
       <h3 className="text-sm font-semibold text-gray-700 mb-3">Blocks</h3>
       <div className="space-y-2">
         {block_registry.map((block) => {
@@ -44,7 +44,7 @@ export function Toolbox() {
                   connectors.create(ref, component);
                 }
               }}
-              className="flex items-center gap-3 p-2 rounded-lg border border-gray-200 cursor-grab hover:border-blue-300 hover:bg-blue-50 transition-colors"
+              className="flex items-center gap-3 p-2 rounded-lg border border-gray-200 cursor-grab hover:border-[#2185d5] hover:bg-[#f3f3f3] transition-colors"
             >
               <Icon size={20} className="text-gray-500" />
               <div>

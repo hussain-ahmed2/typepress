@@ -21,7 +21,7 @@ export function HeadingBlockSettings() {
         <select
           value={level}
           onChange={(e) => setProp((props: HeadingBlockProps) => { props.level = Number(e.target.value) as HeadingBlockProps['level']; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
         >
           <option value={1}>H1</option>
           <option value={2}>H2</option>
@@ -57,7 +57,7 @@ export function HeadingBlockSettings() {
         <select
           value={textAlign}
           onChange={(e) => setProp((props: HeadingBlockProps) => { props.textAlign = e.target.value as HeadingBlockProps['textAlign']; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
         >
           <option value="left">Left</option>
           <option value="center">Center</option>

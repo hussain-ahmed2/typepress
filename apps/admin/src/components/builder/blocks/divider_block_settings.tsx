@@ -21,7 +21,7 @@ export function DividerBlockSettings() {
         <select
           value={style}
           onChange={(e) => setProp((props: DividerBlockProps) => { props.style = e.target.value as DividerBlockProps['style']; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
         >
           <option value="solid">Solid</option>
           <option value="dashed">Dashed</option>

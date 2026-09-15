@@ -23,7 +23,7 @@ export function ButtonBlockSettings() {
           type="text"
           value={text}
           onChange={(e) => setProp((props: ButtonBlockProps) => { props.text = e.target.value; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
         />
       </div>
       <div>
@@ -32,7 +32,7 @@ export function ButtonBlockSettings() {
           type="text"
           value={link}
           onChange={(e) => setProp((props: ButtonBlockProps) => { props.link = e.target.value; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
           placeholder="https://..."
         />
       </div>
@@ -41,7 +41,7 @@ export function ButtonBlockSettings() {
         <select
           value={variant}
           onChange={(e) => setProp((props: ButtonBlockProps) => { props.variant = e.target.value as ButtonBlockProps['variant']; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
         >
           <option value="solid">Solid</option>
           <option value="outline">Outline</option>

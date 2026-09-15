@@ -22,7 +22,7 @@ export function ImageBlockSettings() {
           type="text"
           value={src}
           onChange={(e) => setProp((props: ImageBlockProps) => { props.src = e.target.value; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
           placeholder="https://example.com/image.jpg"
         />
       </div>
@@ -32,7 +32,7 @@ export function ImageBlockSettings() {
           type="text"
           value={alt}
           onChange={(e) => setProp((props: ImageBlockProps) => { props.alt = e.target.value; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
         />
       </div>
       <div>
@@ -41,7 +41,7 @@ export function ImageBlockSettings() {
           type="text"
           value={width}
           onChange={(e) => setProp((props: ImageBlockProps) => { props.width = e.target.value; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
           placeholder="100%"
         />
       </div>
@@ -50,7 +50,7 @@ export function ImageBlockSettings() {
         <select
           value={alignment}
           onChange={(e) => setProp((props: ImageBlockProps) => { props.alignment = e.target.value as ImageBlockProps['alignment']; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
         >
           <option value="left">Left</option>
           <option value="center">Center</option>

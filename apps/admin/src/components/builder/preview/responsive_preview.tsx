@@ -30,15 +30,15 @@ export function ResponsivePreview({ children }: ResponsivePreviewProps) {
             onClick={() => set_breakpoint(bp)}
             className={`px-3 py-1 text-sm rounded-lg ${
               breakpoint === bp
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'style={{ backgroundColor: "#2185d5" }} text-white'
+                : 'style={{ backgroundColor: "#f3f3f3", color: "#3a4750" }} hover:opacity-90'
             }`}
           >
             {breakpoints[bp].icon} {breakpoints[bp].label}
           </button>
         ))}
       </div>
-      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+      <div className="border border-gray-200 rounded-md overflow-hidden bg-white">
         <div
           style={{
             width: current.width,

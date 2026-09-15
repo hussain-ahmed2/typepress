@@ -42,7 +42,7 @@ export function TextBlockSettings() {
         <select
           value={textAlign}
           onChange={(e) => setProp((props: TextBlockProps) => { props.textAlign = e.target.value as TextBlockProps['textAlign']; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
         >
           <option value="left">Left</option>
           <option value="center">Center</option>
@@ -54,7 +54,7 @@ export function TextBlockSettings() {
         <select
           value={fontWeight}
           onChange={(e) => setProp((props: TextBlockProps) => { props.fontWeight = e.target.value as TextBlockProps['fontWeight']; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
         >
           <option value="normal">Normal</option>
           <option value="bold">Bold</option>

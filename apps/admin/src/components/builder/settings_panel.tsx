@@ -45,7 +45,7 @@ export function SettingsPanel() {
 
   if (!selected) {
     return (
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white rounded-md drop-shadow p-4">
         <p className="text-sm text-gray-500">Select a block to edit its properties</p>
       </div>
     );
@@ -54,7 +54,7 @@ export function SettingsPanel() {
   const SettingsComponent = settings_map[selected.name];
 
   return (
-    <div className="bg-white rounded-lg shadow p-4">
+    <div className="bg-white rounded-md drop-shadow p-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-700">{selected.name}</h3>
         <button

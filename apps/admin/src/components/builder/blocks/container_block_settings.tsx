@@ -42,7 +42,7 @@ export function ContainerBlockSettings() {
         <select
           value={flexDirection}
           onChange={(e) => setProp((props: ContainerBlockProps) => { props.flexDirection = e.target.value as ContainerBlockProps['flexDirection']; })}
-          className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+          className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm"
         >
           <option value="column">Vertical</option>
           <option value="row">Horizontal</option>

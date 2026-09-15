@@ -22,7 +22,7 @@ export function ImageBlock({ src, alt, width, alignment }: ImageBlockProps) {
     return (
       <div
         ref={(ref) => { if (ref) connect(drag(ref)); }}
-        className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500"
+        className="bg-[#f3f3f3] border-2 border-dashed border-[#3a4750] rounded-md p-8 text-center text-gray-500"
       >
         Click to add image
       </div>
