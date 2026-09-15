@@ -1,0 +1,6 @@
+{
+  "name": "password-reset",
+  "version": "1.0.0",
+  "description": "Password reset flow via email",
+  "author": "Typepress"
+}

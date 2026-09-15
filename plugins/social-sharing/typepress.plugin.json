@@ -1,0 +1,7 @@
+{
+  "name": "social-sharing",
+  "version": "1.0.0",
+  "description": "Social sharing buttons for content",
+  "slots": ["share_buttons"],
+  "author": "Typepress"
+}

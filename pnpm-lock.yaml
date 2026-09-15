@@ -265,6 +265,19 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  plugins/analytics:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   plugins/comments:
     dependencies:
       '@typepress/plugin-sdk':
@@ -278,7 +291,59 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  plugins/contact-form:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  plugins/password-reset:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   plugins/seo:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  plugins/social-sharing:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  plugins/two-factor-auth:
     dependencies:
       '@typepress/plugin-sdk':
         specifier: workspace:*

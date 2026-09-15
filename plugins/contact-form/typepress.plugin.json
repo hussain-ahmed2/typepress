@@ -1,0 +1,7 @@
+{
+  "name": "contact-form",
+  "version": "1.0.0",
+  "description": "Contact form plugin with email notifications",
+  "slots": ["contact_form"],
+  "author": "Typepress"
+}
