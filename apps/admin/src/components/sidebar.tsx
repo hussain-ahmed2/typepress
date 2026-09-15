@@ -1,8 +1,11 @@
 /**
  * Sidebar Component — Main navigation for the admin panel.
  *
- * Highlights the current route and provides links to all feature sections.
- * Uses Lucide React for consistent, professional icons.
+ * Uses custom color scheme:
+ *   - Primary: #474f85 (dark blue/purple)
+ *   - Accent: #51e3d4 (teal)
+ *   - Background: #f3f9fb (light blue)
+ *   - Cream: #f3ecd3 (light yellow)
  */
 'use client';
 
@@ -43,10 +46,10 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-gray-900 text-white min-h-screen p-4">
+    <aside className="w-64 text-white min-h-screen p-4" style={{ backgroundColor: '#474f85' }}>
       <div className="mb-8">
         <h1 className="text-xl font-bold">Typepress</h1>
-        <p className="text-gray-400 text-sm">Admin Panel</p>
+        <p className="text-sm" style={{ color: '#51e3d4' }}>Admin Panel</p>
       </div>
 
       <nav className="space-y-1">
@@ -61,9 +64,10 @@ export function Sidebar() {
               href={item.href}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
                 is_active
-                  ? 'bg-gray-700 text-white'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'text-white'
+                  : 'text-gray-300 hover:text-white'
               }`}
+              style={is_active ? { backgroundColor: '#51e3d4', color: '#474f85' } : {}}
             >
               <Icon size={18} />
               <span>{item.label}</span>

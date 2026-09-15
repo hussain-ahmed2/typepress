@@ -33,11 +33,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f3f9fb' }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Typepress</h1>
-          <p className="text-gray-500 mt-2">Sign in to the admin panel</p>
+          <h1 className="text-3xl font-bold" style={{ color: '#474f85' }}>Typepress</h1>
+          <p className="mt-2" style={{ color: '#51e3d4' }}>Sign in to the admin panel</p>
         </div>
 
         <div className="bg-white rounded-lg shadow p-8">
@@ -73,7 +73,8 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !email || !password}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+              className="w-full text-white py-2 rounded-lg font-medium disabled:opacity-50"
+              style={{ backgroundColor: '#474f85' }}
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
