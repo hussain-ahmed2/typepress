@@ -5,6 +5,44 @@ Typepress is a TypeScript-native CMS built to surpass WordPress. This document d
 
 ---
 
+## ⚠️ CRITICAL RULES (Must Follow)
+
+### 1. NEVER Commit Without Verifying
+```bash
+# BEFORE committing, ALWAYS:
+pnpm build          # Verify compilation
+pnpm test:run       # Verify tests pass
+# THEN commit
+```
+
+### 2. NEVER Run Servers Without Permission
+```bash
+# DO NOT start Docker, API, Admin, or Renderer unless explicitly asked
+# The user manages their own dev environment
+```
+
+### 3. ALWAYS Test Before Pushing
+```bash
+# BEFORE pushing, ALWAYS:
+pnpm build          # All 12 packages compile
+pnpm test:run       # All 82 tests pass
+# THEN push
+```
+
+### 4. ALWAYS Apply Theme Consistently
+- Use colors: #2185d5 (blue), #3a4750 (gray), #303841 (dark), #f3f3f3 (light)
+- Use drop-shadow, not shadow
+- Use rounded-md, not rounded-lg
+- Apply to ALL components, not just sidebar
+
+### 5. ALWAYS Verify Visual Changes
+- Start the server
+- Open browser
+- Check the UI matches the design
+- THEN commit
+
+---
+
 ## Core Principles
 
 ### 1. OOP First
