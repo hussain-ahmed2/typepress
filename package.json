@@ -15,7 +15,8 @@
     "db:studio": "pnpm --filter @typepress/db studio",
     "docker:up": "docker compose -f docker/docker-compose.yml up -d",
     "docker:down": "docker compose -f docker/docker-compose.yml down",
-    "docker:logs": "docker compose -f docker/docker-compose.yml logs -f"
+    "docker:logs": "docker compose -f docker/docker-compose.yml logs -f",
+    "start": "./start.sh"
   },
   "engines": {
     "node": ">=20.0.0"
