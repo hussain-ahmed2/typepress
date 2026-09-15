@@ -14,6 +14,9 @@ import {
   Paintbrush,
   Image,
   Tags,
+  Menu,
+  Users,
+  Settings,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -29,6 +32,9 @@ const nav_items: NavItem[] = [
   { href: '/builder', label: 'Builder', icon: Paintbrush },
   { href: '/media', label: 'Media', icon: Image },
   { href: '/taxonomy', label: 'Taxonomy', icon: Tags },
+  { href: '/menus', label: 'Menus', icon: Menu },
+  { href: '/users', label: 'Users', icon: Users },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ];
 
 export function Sidebar() {
