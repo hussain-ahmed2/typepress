@@ -38,7 +38,7 @@ export function ImageBlock({ src, alt, width, alignment }: ImageBlockProps) {
         src={src}
         alt={alt}
         style={{ width, maxWidth: '100%' }}
-        className="rounded-lg"
+        className="rounded-md"
       />
     </div>
   );

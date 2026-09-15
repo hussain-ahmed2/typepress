@@ -53,7 +53,7 @@ export function BuilderEditor({ onSave }: BuilderEditorProps) {
                 // Serialization will be handled by the page component
                 onSave?.('');
               }}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700"
+              className="text-white px-6 py-2 rounded-md font-medium hover:opacity-90" style={{ backgroundColor: "#2185d5" }}
             >
               Save Page
             </button>

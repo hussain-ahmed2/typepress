@@ -78,14 +78,14 @@ export default function MenusPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Menu List */}
-        <div className="bg-white rounded-lg drop-shadow p-4">
+        <div className="bg-white rounded-md drop-shadow p-4">
           <h2 className="text-lg font-semibold mb-4">All Menus</h2>
           <div className="space-y-2 mb-4">
             {menus.map((menu) => (
               <div
                 key={menu.id}
                 onClick={() => set_selected_menu(menu)}
-                className={`p-3 rounded-lg cursor-pointer transition-colors ${
+                className={`p-3 rounded-md cursor-pointer transition-colors ${
                   selected_menu?.id === menu.id
                     ? 'bg-blue-50 border border-blue-200'
                     : 'bg-gray-50 hover:bg-gray-100'
@@ -107,7 +107,7 @@ export default function MenusPage() {
             />
             <button
               onClick={handle_create_menu}
-              className="bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700"
+              className="text-white px-3 py-2 rounded-md text-sm hover:opacity-90" style={{ backgroundColor: "#2185d5" }}
             >
               <Plus size={16} />
             </button>
@@ -115,7 +115,7 @@ export default function MenusPage() {
         </div>
 
         {/* Menu Items */}
-        <div className="lg:col-span-2 bg-white rounded-lg drop-shadow p-4">
+        <div className="lg:col-span-2 bg-white rounded-md drop-shadow p-4">
           {selected_menu ? (
             <>
               <div className="flex items-center justify-between mb-4">
@@ -146,7 +146,7 @@ export default function MenusPage() {
                 />
                 <button
                   onClick={handle_add_item}
-                  className="bg-blue-600 text-white px-3 py-2 rounded text-sm hover:bg-blue-700"
+                  className="text-white px-3 py-2 rounded-md text-sm hover:opacity-90" style={{ backgroundColor: "#2185d5" }}
                 >
                   Add
                 </button>
@@ -160,7 +160,7 @@ export default function MenusPage() {
                 {selected_menu.items?.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-md"
                   >
                     <GripVertical size={16} className="text-gray-400" />
                     <span className="flex-1 font-medium">{item.label}</span>

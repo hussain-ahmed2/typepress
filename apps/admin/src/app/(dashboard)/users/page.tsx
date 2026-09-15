@@ -58,7 +58,7 @@ export default function UsersPage() {
       {loading ? (
         <p className="text-gray-500">Loading users...</p>
       ) : (
-        <div className="bg-white rounded-lg drop-shadow overflow-hidden">
+        <div className="bg-white rounded-md drop-shadow overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -114,7 +114,7 @@ export default function UsersPage() {
       {/* Edit Role Modal */}
       {editing_user && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg drop-shadow p-6 w-96">
+          <div className="bg-white rounded-md drop-shadow p-6 w-96">
             <h3 className="text-lg font-semibold mb-4">Edit Role: {editing_user.name || editing_user.email}</h3>
             <select
               value={edit_role}
@@ -135,7 +135,7 @@ export default function UsersPage() {
               </button>
               <button
                 onClick={handle_update_role}
-                className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+                className="px-4 py-2 text-white rounded-md hover:opacity-90" style={{ backgroundColor: "#2185d5" }}
               >
                 Save
               </button>

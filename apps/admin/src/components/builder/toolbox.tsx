@@ -44,7 +44,7 @@ export function Toolbox() {
                   connectors.create(ref, component);
                 }
               }}
-              className="flex items-center gap-3 p-2 rounded-lg border border-gray-200 cursor-grab hover:border-[#2185d5] hover:bg-[#f3f3f3] transition-colors"
+              className="flex items-center gap-3 p-2 rounded-md border border-gray-200 cursor-grab hover:border-[#2185d5] hover:bg-[#f3f3f3] transition-colors"
             >
               <Icon size={20} className="text-gray-500" />
               <div>

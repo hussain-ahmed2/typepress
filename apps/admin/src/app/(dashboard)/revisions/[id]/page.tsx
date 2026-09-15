@@ -55,14 +55,14 @@ export default function RevisionsPage() {
       {loading ? (
         <p className="text-gray-500">Loading revisions...</p>
       ) : revisions.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
+        <div className="bg-white rounded-md drop-shadow p-8 text-center">
           <Clock size={48} className="mx-auto text-gray-300 mb-4" />
           <p className="text-gray-500">No revisions yet. Revisions are created when you save content.</p>
         </div>
       ) : (
         <div className="space-y-4">
           {revisions.map((rev) => (
-            <div key={rev.id} className="bg-white rounded-lg shadow p-4">
+            <div key={rev.id} className="bg-white rounded-md drop-shadow p-4">
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="font-medium">{rev.data.title}</h3>

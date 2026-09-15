@@ -68,7 +68,7 @@ export default function TaxonomyPage() {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Taxonomy</h1>
 
       {/* Create form */}
-      <div className="bg-white rounded-lg drop-shadow p-6 mb-6">
+      <div className="bg-white rounded-md drop-shadow p-6 mb-6">
         <h2 className="text-lg font-medium text-gray-900 mb-4">Add Taxonomy</h2>
         <div className="flex gap-3 items-end">
           <div className="flex-1">
@@ -77,7 +77,7 @@ export default function TaxonomyPage() {
               type="text"
               value={new_name}
               onChange={(e) => set_new_name(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               placeholder="Category name"
             />
           </div>
@@ -87,7 +87,7 @@ export default function TaxonomyPage() {
               type="text"
               value={new_slug}
               onChange={(e) => set_new_slug(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
               placeholder="auto-generated"
             />
           </div>
@@ -96,7 +96,7 @@ export default function TaxonomyPage() {
             <select
               value={new_type}
               onChange={(e) => set_new_type(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
             >
               <option value="category">Category</option>
               <option value="tag">Tag</option>
@@ -105,7 +105,7 @@ export default function TaxonomyPage() {
           <button
             onClick={handle_create}
             disabled={creating || !new_name}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="text-white px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50" style={{ backgroundColor: "#2185d5" }}
           >
             {creating ? 'Adding...' : 'Add'}
           </button>
@@ -116,11 +116,11 @@ export default function TaxonomyPage() {
       {loading ? (
         <p className="text-gray-500">Loading...</p>
       ) : taxonomies.length === 0 ? (
-        <div className="bg-white rounded-lg drop-shadow p-8 text-center">
+        <div className="bg-white rounded-md drop-shadow p-8 text-center">
           <p className="text-gray-500">No taxonomies yet.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg drop-shadow overflow-hidden">
+        <div className="bg-white rounded-md drop-shadow overflow-hidden">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>

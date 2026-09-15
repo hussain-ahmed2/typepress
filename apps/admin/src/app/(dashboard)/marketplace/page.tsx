@@ -64,7 +64,7 @@ export default function MarketplacePage() {
             <button
               key={f}
               onClick={() => set_filter(f)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === f ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              className={`px-4 py-2 rounded-md text-sm font-medium ${filter === f ? 'style={{ backgroundColor: "#2185d5" }} text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
             >
               {f === 'all' ? 'All' : f === 'plugin' ? 'Plugins' : 'Themes'}
             </button>
@@ -75,13 +75,13 @@ export default function MarketplacePage() {
           value={search}
           onChange={(e) => set_search(e.target.value)}
           placeholder="Search marketplace..."
-          className="flex-1 max-w-md border border-gray-300 rounded-lg px-4 py-2 text-sm"
+          className="flex-1 max-w-md border border-gray-300 rounded-md px-4 py-2 text-sm"
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filtered.map((item) => (
-          <div key={item.name} className="bg-white rounded-lg drop-shadow p-4 hover:drop-shadow-md transition-drop-shadow">
+          <div key={item.name} className="bg-white rounded-md drop-shadow p-4 hover:drop-shadow-md transition-drop-shadow">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 {item.type === 'plugin' ? <Package size={24} className="text-blue-500" /> : <Palette size={24} className="text-purple-500" />}

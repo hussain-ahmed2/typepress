@@ -1,8 +1,7 @@
 /**
- * Content Editor Page — Create or edit content with a form-based editor.
+ * Content Editor Page — Create or edit content.
  *
- * Handles both creation (new) and editing (existing ID) via the same component.
- * Uses controlled form state with client-side validation before API submission.
+ * Theme: #2185d5 (blue), #3a4750 (gray), #303841 (dark), #f3f3f3 (light)
  */
 'use client';
 
@@ -25,9 +24,7 @@ export default function ContentEditorPage() {
 
   useEffect(() => {
     if (is_editing) {
-      api.get<{ data: { title: string; slug: string; type: string; status: string; meta: { excerpt?: string } } }>(
-        `/api/content/${id}`,
-      ).then((result) => {
+      api.get(`/api/content/${id}`).then((result: any) => {
         if (result.success && result.data) {
           const d = result.data.data;
           set_title(d.title);
@@ -41,85 +38,54 @@ export default function ContentEditorPage() {
   }, [id, is_editing]);
 
   function generate_slug(text: string) {
-    return text
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   }
 
   async function handle_submit() {
     set_saving(true);
-
-    const body = {
-      title,
-      slug: slug || generate_slug(title),
-      type,
-      status,
-      meta: { excerpt: meta_excerpt },
-    };
-
+    const body = { title, slug: slug || generate_slug(title), type, status, meta: { excerpt: meta_excerpt } };
     const result = is_editing
       ? await api.put(`/api/content/${id}`, body)
       : await api.post('/api/content', body);
-
     set_saving(false);
-
-    if (result.success) {
-      router.push('/content');
-    } else {
-      alert(result.error?.message || 'Failed to save');
-    }
+    if (result.success) router.push('/content');
+    else alert(result.error?.message || 'Failed to save');
   }
 
   return (
-    <div className="max-w-3xl">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">
+    <div className="px-4 sm:px-6 lg:px-8 max-w-3xl">
+      <h1 className="text-2xl font-bold mb-6" style={{ color: '#303841' }}>
         {is_editing ? 'Edit Content' : 'New Content'}
       </h1>
 
-      <div className="bg-white rounded-lg shadow p-6 space-y-6">
+      <div className="bg-white rounded-md p-6 drop-shadow space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => set_title(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter title..."
-          />
+          <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Title</label>
+          <input type="text" value={title} onChange={(e) => set_title(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]"
+            placeholder="Enter title..." />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Slug</label>
-          <input
-            type="text"
-            value={slug}
-            onChange={(e) => set_slug(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="auto-generated-from-title"
-          />
+          <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Slug</label>
+          <input type="text" value={slug} onChange={(e) => set_slug(e.target.value)}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]"
+            placeholder="auto-generated-from-title" />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-            <select
-              value={type}
-              onChange={(e) => set_type(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Type</label>
+            <select value={type} onChange={(e) => set_type(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]">
               <option value="post">Post</option>
               <option value="page">Page</option>
             </select>
           </div>
-
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select
-              value={status}
-              onChange={(e) => set_status(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
+            <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Status</label>
+            <select value={status} onChange={(e) => set_status(e.target.value)}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]">
               <option value="DRAFT">Draft</option>
               <option value="PUBLISHED">Published</option>
             </select>
@@ -127,28 +93,21 @@ export default function ContentEditorPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Excerpt</label>
-          <textarea
-            value={meta_excerpt}
-            onChange={(e) => set_meta_excerpt(e.target.value)}
-            rows={3}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Optional summary..."
-          />
+          <label className="block text-sm font-medium mb-1" style={{ color: '#3a4750' }}>Excerpt</label>
+          <textarea value={meta_excerpt} onChange={(e) => set_meta_excerpt(e.target.value)} rows={3}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2185d5]"
+            placeholder="Optional summary..." />
         </div>
 
         <div className="flex gap-3">
-          <button
-            onClick={handle_submit}
-            disabled={saving || !title}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-          >
+          <button onClick={handle_submit} disabled={saving || !title}
+            className="text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
+            style={{ backgroundColor: '#2185d5' }}>
             {saving ? 'Saving...' : is_editing ? 'Update' : 'Create'}
           </button>
-          <button
-            onClick={() => router.push('/content')}
-            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-300"
-          >
+          <button onClick={() => router.push('/content')}
+            className="px-4 py-2 rounded-md text-sm font-medium"
+            style={{ backgroundColor: '#f3f3f3', color: '#3a4750' }}>
             Cancel
           </button>
         </div>

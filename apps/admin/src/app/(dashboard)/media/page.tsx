@@ -43,13 +43,13 @@ export default function MediaPage() {
       {loading ? (
         <p className="text-gray-500">Loading...</p>
       ) : media.length === 0 ? (
-        <div className="bg-white rounded-lg drop-shadow p-8 text-center">
+        <div className="bg-white rounded-md drop-shadow p-8 text-center">
           <p className="text-gray-500">No media uploaded yet.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {media.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg drop-shadow overflow-hidden">
+            <div key={item.id} className="bg-white rounded-md drop-shadow overflow-hidden">
               <div className="aspect-square bg-gray-100 flex items-center justify-center">
                 <span className="text-4xl">📄</span>
               </div>
