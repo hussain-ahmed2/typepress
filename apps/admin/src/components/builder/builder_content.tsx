@@ -1,7 +1,7 @@
 /**
- * Builder Content — Uses our custom block editor (React 19 compatible).
+ * Builder Content — Uses dnd-kit powered block editor.
  *
- * No Craft.js dependency — built from scratch for full control.
+ * React 19 compatible, accessible, with good UI/UX.
  */
 'use client';
 
@@ -29,28 +29,20 @@ export default function BuilderContent() {
     });
 
     set_saving(false);
-
-    if (result.success) {
-      router.push('/content');
-    } else {
-      alert(result.error?.message || 'Failed to save');
-    }
+    if (result.success) router.push('/content');
+    else alert(result.error?.message || 'Failed to save');
   }
 
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold" style={{ color: '#303841' }}>Page Builder</h1>
-        <button
-          onClick={handle_save}
-          disabled={saving}
+        <button onClick={handle_save} disabled={saving}
           className="text-white px-6 py-2 rounded-md font-medium hover:opacity-90 disabled:opacity-50"
-          style={{ backgroundColor: '#2185d5' }}
-        >
+          style={{ backgroundColor: '#2185d5' }}>
           {saving ? 'Saving...' : 'Save Page'}
         </button>
       </div>
-
       <ResponsivePreview>
         <BlockEditor initial_blocks={blocks} />
       </ResponsivePreview>

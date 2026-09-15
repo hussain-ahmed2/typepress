@@ -1,104 +1,64 @@
 /**
  * Settings Panel — Property editor for the selected block.
  *
- * Uses useEditor to track selection and modify props directly.
- * Does NOT use useNode (which requires being inside a specific component tree).
+ * Accessible, keyboard-navigable, with proper labels.
  */
 'use client';
 
-import React from 'react';
-import { useEditor } from '@craftjs/core';
+import type { Block } from './block_editor';
+import { block_types } from './block_types';
 import { Trash2 } from 'lucide-react';
 
-export function SettingsPanel() {
-  const { actions, selected } = useEditor((state) => {
-    const [currentNodeId] = state.events.selected;
-    let selected;
+interface SettingsPanelProps {
+  block: Block;
+  onUpdate: (props: Record<string, unknown>) => void;
+  onDelete: () => void;
+}
 
-    if (currentNodeId && state.nodes[currentNodeId]) {
-      const node = state.nodes[currentNodeId];
-      selected = {
-        id: currentNodeId,
-        name: node.data.name,
-        props: node.data.props,
-        isDeletable: node.data.parent !== undefined,
-      };
-    }
-
-    return { selected };
-  });
-
-  if (!selected) {
-    return (
-      <div className="bg-white rounded-md drop-shadow p-4">
-        <p className="text-sm" style={{ color: '#3a4750' }}>Select a block to edit its properties</p>
-      </div>
-    );
-  }
-
-  function update_prop(key: string, value: any) {
-    if (!selected) return;
-    actions.setProp(selected.id, (node: any) => {
-      node.data.props[key] = value;
-    });
-  }
+export function SettingsPanel({ block, onUpdate, onDelete }: SettingsPanelProps) {
+  const block_type = block_types.find((b) => b.type === block.type);
 
   return (
     <div className="bg-white rounded-md drop-shadow p-4">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold" style={{ color: '#303841' }}>{selected.name}</h3>
-        <button
-          onClick={() => actions.delete(selected.id)}
-          className="p-1 hover:opacity-80"
-          style={{ color: '#ef4444' }}
-          title="Delete block"
-        >
+        <h3 className="text-sm font-semibold" style={{ color: '#303841' }}>
+          {block_type?.label || block.type}
+        </h3>
+        <button onClick={onDelete} className="p-1 hover:opacity-80" style={{ color: '#ef4444' }} aria-label="Delete block">
           <Trash2 size={14} />
         </button>
       </div>
 
       <div className="space-y-3">
-        {Object.entries(selected.props).map(([key, value]) => {
-          if (key === 'children' || key === 'canvas') return null;
-
-          return (
-            <div key={key}>
-              <label className="block text-xs font-medium mb-1" style={{ color: '#3a4750' }}>
-                {key.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
-              </label>
-              {typeof value === 'string' && value.startsWith('#') ? (
-                <input
-                  type="color"
-                  value={value}
-                  onChange={(e) => update_prop(key, e.target.value)}
-                  className="w-full h-8 rounded-md border border-gray-300"
-                />
-              ) : typeof value === 'number' ? (
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={value as number}
-                  onChange={(e) => update_prop(key, Number(e.target.value))}
-                  className="w-full"
-                />
-              ) : typeof value === 'boolean' ? (
-                <input
-                  type="checkbox"
-                  checked={value as boolean}
-                  onChange={(e) => update_prop(key, e.target.checked)}
-                />
-              ) : (
-                <input
-                  type="text"
-                  value={String(value)}
-                  onChange={(e) => update_prop(key, e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:border-[#2185d5] focus:outline-none"
-                />
-              )}
-            </div>
-          );
-        })}
+        {block_type?.settings.map((setting) => (
+          <div key={setting.key}>
+            <label htmlFor={`prop-${setting.key}`} className="block text-xs font-medium mb-1" style={{ color: '#3a4750' }}>
+              {setting.label}
+            </label>
+            {setting.type === 'color' ? (
+              <input id={`prop-${setting.key}`} type="color" value={String(block.props[setting.key] || '#000000')}
+                onChange={(e) => onUpdate({ [setting.key]: e.target.value })}
+                className="w-full h-8 rounded-md border border-gray-300" />
+            ) : setting.type === 'number' ? (
+              <input id={`prop-${setting.key}`} type="range" min={setting.min || 0} max={setting.max || 100}
+                value={Number(block.props[setting.key] || 0)}
+                onChange={(e) => onUpdate({ [setting.key]: Number(e.target.value) })}
+                className="w-full" />
+            ) : setting.type === 'select' ? (
+              <select id={`prop-${setting.key}`} value={String(block.props[setting.key] || '')}
+                onChange={(e) => onUpdate({ [setting.key]: e.target.value })}
+                className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:border-[#2185d5] focus:outline-none">
+                {setting.options?.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            ) : (
+              <input id={`prop-${setting.key}`} type="text" value={String(block.props[setting.key] || '')}
+                onChange={(e) => onUpdate({ [setting.key]: e.target.value })}
+                className="w-full border border-gray-300 rounded-md px-2 py-1 text-sm focus:border-[#2185d5] focus:outline-none" />
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
