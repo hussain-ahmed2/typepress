@@ -74,4 +74,3 @@ export default define_plugin({
   },
 });
 
-export { create_reset_token, verify_reset_token, invalidate_token };

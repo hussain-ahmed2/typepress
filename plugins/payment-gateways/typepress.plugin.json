@@ -1,0 +1,6 @@
+{
+  "name": "payment-gateways",
+  "version": "1.0.0",
+  "description": "Multiple payment gateway support (Stripe, PayPal, Bank Transfer)",
+  "author": "Typepress"
+}

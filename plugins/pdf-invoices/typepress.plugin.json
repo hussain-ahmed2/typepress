@@ -1,0 +1,6 @@
+{
+  "name": "pdf-invoices",
+  "version": "1.0.0",
+  "description": "PDF invoice generation for orders",
+  "author": "Typepress"
+}

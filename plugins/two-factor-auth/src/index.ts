@@ -52,4 +52,3 @@ export default define_plugin({
   },
 });
 
-export { generate_secret, generate_backup_codes, generate_qr_url };

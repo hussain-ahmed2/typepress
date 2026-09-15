@@ -48,4 +48,3 @@ export default define_plugin({
   },
 });
 
-export { page_views };

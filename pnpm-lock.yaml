@@ -349,6 +349,19 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  plugins/email-templates:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   plugins/orders:
     dependencies:
       '@typepress/plugin-sdk':
@@ -363,6 +376,32 @@ importers:
         version: 5.9.3
 
   plugins/password-reset:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  plugins/payment-gateways:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  plugins/pdf-invoices:
     dependencies:
       '@typepress/plugin-sdk':
         specifier: workspace:*
@@ -401,7 +440,46 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  plugins/shipping:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   plugins/social-sharing:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  plugins/subscriptions:
+    dependencies:
+      '@typepress/plugin-sdk':
+        specifier: workspace:*
+        version: link:../../packages/plugin_sdk
+      '@typepress/shared-types':
+        specifier: workspace:*
+        version: link:../../packages/shared_types
+    devDependencies:
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
+  plugins/tax-rates:
     dependencies:
       '@typepress/plugin-sdk':
         specifier: workspace:*
