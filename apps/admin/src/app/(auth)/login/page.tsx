@@ -1,7 +1,7 @@
 /**
  * Login Page — Accessible, responsive login form.
  *
- * Color scheme: Sky blue primary (#0284C7)
+ * Uses drop-shadow and clean button styling.
  */
 'use client';
 
@@ -36,14 +36,14 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold" style={{ color: '#0284C7' }}>Typepress</h1>
-          <p className="mt-2 text-sky-600">Sign in to the admin panel</p>
+          <p className="mt-2" style={{ color: '#0284C7' }}>Sign in to the admin panel</p>
         </div>
 
-        <div className="bg-white rounded-lg p-8 shadow-md">
+        <div className="bg-white rounded-md p-8 drop-shadow-md">
           {error && (
             <div
               role="alert"
-              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm"
+              className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 text-sm"
             >
               {error}
             </div>
@@ -59,7 +59,7 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => set_email((e.target as HTMLInputElement).value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
                 placeholder="admin@typepress.dev"
                 aria-required="true"
                 autoComplete="email"
@@ -75,7 +75,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => set_password((e.target as HTMLInputElement).value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
                 placeholder="••••••••"
                 aria-required="true"
                 autoComplete="current-password"
@@ -85,7 +85,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading || !email || !password}
-              className="w-full text-white py-2 rounded-lg font-medium disabled:opacity-50 shadow-md hover:shadow-lg transition-shadow"
+              className="flex items-center justify-center gap-3 w-full rounded-md px-3 py-2 text-sm font-medium transition-colors text-white disabled:opacity-50"
               style={{ backgroundColor: '#0284C7' }}
               aria-busy={loading}
             >

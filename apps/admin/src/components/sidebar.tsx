@@ -1,8 +1,8 @@
 /**
  * Sidebar Component — Sticky, responsive, accessible navigation.
  *
- * Fixes: Sidebar now stays fixed while content scrolls.
- * Color scheme: Sky blue primary (#0284C7)
+ * Uses drop-shadow instead of box-shadow.
+ * Button style matches the user's preferred design.
  */
 'use client';
 
@@ -50,17 +50,16 @@ export function Sidebar() {
       {/* Mobile hamburger */}
       <button
         onClick={() => set_isOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg text-white shadow-md"
-        style={{ backgroundColor: '#0284C7' }}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md text-muted-foreground hover:bg-accent hover:text-foreground drop-shadow"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
       >
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
-      {/* Sidebar — sticky on desktop, fixed on mobile */}
+      {/* Sidebar */}
       <aside
-        className={`w-64 text-white min-h-screen p-4 transition-transform duration-300 ${
+        className={`w-64 min-h-screen p-4 transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen`}
         style={{ backgroundColor: '#0284C7' }}
@@ -68,7 +67,7 @@ export function Sidebar() {
         aria-label="Main navigation"
       >
         <div className="mb-8">
-          <h1 className="text-xl font-bold">Typepress</h1>
+          <h1 className="text-xl font-bold text-white">Typepress</h1>
           <p className="text-sm text-sky-200">Admin Panel</p>
         </div>
 
@@ -83,15 +82,15 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => set_isOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-200 ${
+                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   is_active
-                    ? 'text-white shadow-md'
-                    : 'text-white/70 hover:text-white hover:shadow-sm'
+                    ? 'text-white drop-shadow-md'
+                    : 'text-white/70 hover:text-white'
                 }`}
                 style={is_active ? { backgroundColor: '#10B981' } : {}}
                 aria-current={is_active ? 'page' : undefined}
               >
-                <Icon size={18} aria-hidden="true" />
+                <Icon size={20} className="shrink-0" aria-hidden="true" />
                 <span>{item.label}</span>
               </Link>
             );
