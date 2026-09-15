@@ -149,6 +149,10 @@ export class ContentService {
         status: data.status,
         meta: data.meta as never,
         author_id,
+        published_at: data.published_at ? new Date(data.published_at) : null,
+        password: data.password,
+        is_sticky: data.is_sticky,
+        format: data.format,
       },
     });
 
@@ -192,6 +196,10 @@ export class ContentService {
     if (data.title !== undefined) update_data.title = data.title;
     if (data.status !== undefined) update_data.status = data.status;
     if (data.meta !== undefined) update_data.meta = data.meta as never;
+    if (data.published_at !== undefined) update_data.published_at = data.published_at ? new Date(data.published_at) : null;
+    if (data.password !== undefined) update_data.password = data.password;
+    if (data.is_sticky !== undefined) update_data.is_sticky = data.is_sticky;
+    if (data.format !== undefined) update_data.format = data.format;
 
     const content = await prisma.content.update({
       where: { id },

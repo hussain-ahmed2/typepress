@@ -102,7 +102,7 @@ describe('ContentService', () => {
       mock_content.content.create.mockResolvedValue({ id: '1', title: 'New Post', slug: 'new-post' });
 
       const result = await service.create(
-        { type: 'post', slug: 'new-post', title: 'New Post', status: 'DRAFT', meta: {}, taxonomy_ids: [] },
+        { type: 'post', slug: 'new-post', title: 'New Post', status: 'DRAFT', meta: {}, taxonomy_ids: [], is_sticky: false, format: 'standard' },
         'author-1',
       );
 
@@ -114,7 +114,7 @@ describe('ContentService', () => {
       mock_content.content.findUnique.mockResolvedValue({ id: 'existing' });
 
       const result = await service.create(
-        { type: 'post', slug: 'existing-slug', title: 'Test', status: 'DRAFT', meta: {}, taxonomy_ids: [] },
+        { type: 'post', slug: 'existing-slug', title: 'Test', status: 'DRAFT', meta: {}, taxonomy_ids: [], is_sticky: false, format: 'standard' },
         'author-1',
       );
 

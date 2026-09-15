@@ -38,21 +38,27 @@ model User {
 }
 
 model Content {
-  id          String             @id @default(cuid())
-  type        String
-  slug        String             @unique
-  title       String
-  status      ContentStatus      @default(DRAFT)
-  meta        Json               @default("{}")
-  author_id   String
-  author      User               @relation(fields: [author_id], references: [id])
-  created_at  DateTime           @default(now())
-  updated_at  DateTime           @updatedAt
-  taxonomies  TaxonomyRelation[]
-  revisions   Revision[]
+  id            String             @id @default(cuid())
+  type          String
+  slug          String             @unique
+  title         String
+  status        ContentStatus      @default(DRAFT)
+  meta          Json               @default("{}")
+  author_id     String
+  author        User               @relation(fields: [author_id], references: [id])
+  created_at    DateTime           @default(now())
+  updated_at    DateTime           @updatedAt
+  published_at  DateTime?          // Scheduled publish time
+  password      String?            // Password-protected posts
+  is_sticky     Boolean            @default(false)
+  format        String             @default("standard") // standard, video, gallery, quote, aside, link, image
+  taxonomies    TaxonomyRelation[]
+  revisions     Revision[]
 
   @@index([type, status])
   @@index([author_id])
+  @@index([published_at])
+  @@index([is_sticky])
 }
 
 model Media {

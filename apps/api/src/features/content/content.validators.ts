@@ -14,6 +14,10 @@ export const create_content_schema = z.object({
   status: z.enum(['DRAFT', 'PUBLISHED']).optional().default('DRAFT'),
   meta: z.record(z.unknown()).optional().default({}),
   taxonomy_ids: z.array(z.string()).optional().default([]),
+  published_at: z.string().datetime().optional(),
+  password: z.string().optional(),
+  is_sticky: z.boolean().optional().default(false),
+  format: z.enum(['standard', 'video', 'gallery', 'quote', 'aside', 'link', 'image']).optional().default('standard'),
 });
 
 export const update_content_schema = z.object({
@@ -22,6 +26,10 @@ export const update_content_schema = z.object({
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'TRASH']).optional(),
   meta: z.record(z.unknown()).optional(),
   taxonomy_ids: z.array(z.string()).optional(),
+  published_at: z.string().datetime().nullable().optional(),
+  password: z.string().nullable().optional(),
+  is_sticky: z.boolean().optional(),
+  format: z.enum(['standard', 'video', 'gallery', 'quote', 'aside', 'link', 'image']).optional(),
 });
 
 export const list_content_schema = z.object({
@@ -31,6 +39,8 @@ export const list_content_schema = z.object({
   status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'TRASH']).optional(),
   sort: z.enum(['created_at', 'updated_at', 'title']).optional().default('created_at'),
   order: z.enum(['asc', 'desc']).optional().default('desc'),
+  sticky: z.coerce.boolean().optional(),
+  format: z.string().optional(),
 });
 
 export type CreateContentInput = z.infer<typeof create_content_schema>;

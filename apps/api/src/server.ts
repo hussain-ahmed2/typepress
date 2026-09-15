@@ -26,6 +26,9 @@ import { load_plugins } from './plugin_loader';
 import { PluginManager } from '@typepress/core';
 import { register_graphql } from './graphql';
 import { create_socket_server } from './realtime/socket';
+import { scheduler } from './infrastructure/scheduler';
+import { rss_generator } from './infrastructure/rss';
+import { sitemap_generator } from './infrastructure/sitemap';
 
 export async function create_server() {
   const app = Fastify({ logger: true });
@@ -63,6 +66,27 @@ export async function create_server() {
   // --- GraphQL ---
   await register_graphql(app);
 
+  // --- RSS Feed ---
+  app.get('/feed', async (_request, reply) => {
+    const xml = await rss_generator.generate();
+    reply.header('Content-Type', 'application/rss+xml');
+    return reply.send(xml);
+  });
+
+  app.get('/feed/:type', async (request, reply) => {
+    const { type } = request.params as { type: string };
+    const xml = await rss_generator.generate(type);
+    reply.header('Content-Type', 'application/rss+xml');
+    return reply.send(xml);
+  });
+
+  // --- Sitemap ---
+  app.get('/sitemap.xml', async (_request, reply) => {
+    const xml = await sitemap_generator.generate();
+    reply.header('Content-Type', 'application/xml');
+    return reply.send(xml);
+  });
+
   // --- Health check ---
   app.get('/health', async () => ({
     status: 'ok',
@@ -80,4 +104,5 @@ export async function start_server() {
   await app.listen({ port: config.API_PORT, host: config.API_HOST });
   console.log(`API server running on http://${config.API_HOST}:${config.API_PORT}`);
   create_socket_server(app.server);
+  scheduler.start();
 }
