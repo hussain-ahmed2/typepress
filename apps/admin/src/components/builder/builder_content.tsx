@@ -46,7 +46,8 @@ function SaveButton() {
     <button
       onClick={handle_save}
       disabled={saving}
-      className="style={{ backgroundColor: "#2185d5" }} text-white px-6 py-2 rounded-md font-medium hover:opacity-90 disabled:opacity-50"
+      className="text-white px-6 py-2 rounded-md font-medium hover:opacity-90 disabled:opacity-50"
+      style={{ backgroundColor: '#2185d5' }}
     >
       {saving ? 'Saving...' : 'Save Page'}
     </button>
