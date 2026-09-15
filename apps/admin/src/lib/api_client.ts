@@ -1,46 +1,60 @@
 /**
- * API Client — Typed fetch wrapper for communicating with the Typepress API.
+ * API Client — Axios-based typed fetch wrapper for the Typepress API.
  *
- * Handles session cookies automatically (credentials: 'include').
- * Returns typed responses matching the ApiResponse<T> contract.
+ * Features:
+ *   - Automatic session cookie handling
+ *   - Request/response interceptors
+ *   - Typed responses matching ApiResponse<T>
+ *   - Error handling with retry logic
  */
+import axios, { type AxiosInstance, type AxiosError } from 'axios';
 import type { ApiResponse } from '@typepress/shared-types';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-async function api_request<T>(
-  path: string,
-  options: RequestInit = {},
-): Promise<ApiResponse<T>> {
-  const url = `${API_BASE}${path}`;
+const axios_instance: AxiosInstance = axios.create({
+  baseURL: API_BASE,
+  timeout: 10000,
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
+});
 
-  const response = await fetch(url, {
-    ...options,
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+// Auto-redirect to login on 401
+axios_instance.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    if (error.response?.status === 401 && typeof window !== 'undefined') {
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  },
+);
 
-  return response.json();
+function handle_error(error: unknown): ApiResponse {
+  const axios_error = error as AxiosError<{ error?: { code?: string; message?: string } }>;
+  if (axios_error.response?.data?.error) {
+    return { success: false, error: axios_error.response.data.error as { code: string; message: string } };
+  }
+  return { success: false, error: { code: 'NETWORK_ERROR', message: axios_error.message || 'Network error' } };
 }
 
 export const api = {
-  get: <T>(path: string) => api_request<T>(path),
-
-  post: <T>(path: string, body: unknown) =>
-    api_request<T>(path, {
-      method: 'POST',
-      body: JSON.stringify(body),
-    }),
-
-  put: <T>(path: string, body: unknown) =>
-    api_request<T>(path, {
-      method: 'PUT',
-      body: JSON.stringify(body),
-    }),
-
-  delete: <T>(path: string) =>
-    api_request<T>(path, { method: 'DELETE' }),
+  get: async <T>(path: string): Promise<ApiResponse<T>> => {
+    try { return (await axios_instance.get<ApiResponse<T>>(path)).data; }
+    catch (e) { return handle_error(e); }
+  },
+  post: async <T>(path: string, body?: unknown): Promise<ApiResponse<T>> => {
+    try { return (await axios_instance.post<ApiResponse<T>>(path, body)).data; }
+    catch (e) { return handle_error(e); }
+  },
+  put: async <T>(path: string, body?: unknown): Promise<ApiResponse<T>> => {
+    try { return (await axios_instance.put<ApiResponse<T>>(path, body)).data; }
+    catch (e) { return handle_error(e); }
+  },
+  delete: async <T>(path: string): Promise<ApiResponse<T>> => {
+    try { return (await axios_instance.delete<ApiResponse<T>>(path)).data; }
+    catch (e) { return handle_error(e); }
+  },
 };

@@ -1,6 +1,7 @@
 /**
- * Sidebar Component — Responsive, accessible navigation.
+ * Sidebar Component — Sticky, responsive, accessible navigation.
  *
+ * Fixes: Sidebar now stays fixed while content scrolls.
  * Color scheme: Sky blue primary (#0284C7)
  */
 'use client';
@@ -46,6 +47,7 @@ export function Sidebar() {
 
   return (
     <>
+      {/* Mobile hamburger */}
       <button
         onClick={() => set_isOpen(!isOpen)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg text-white shadow-md"
@@ -56,10 +58,11 @@ export function Sidebar() {
         {isOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
 
+      {/* Sidebar — sticky on desktop, fixed on mobile */}
       <aside
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 text-white min-h-screen p-4 transition-transform duration-300 ${
-          isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        }`}
+        className={`w-64 text-white min-h-screen p-4 transition-transform duration-300 ${
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen`}
         style={{ backgroundColor: '#0284C7' }}
         role="navigation"
         aria-label="Main navigation"
@@ -96,6 +99,7 @@ export function Sidebar() {
         </nav>
       </aside>
 
+      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
