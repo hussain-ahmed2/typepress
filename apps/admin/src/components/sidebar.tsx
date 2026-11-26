@@ -1,17 +1,18 @@
 /**
  * Sidebar Component — Sticky, responsive, accessible navigation.
  *
- * Colors: #2185d5 (blue), #3a4750 (gray), #303841 (dark), #f3f3f3 (light)
- * Uses Lucide icons throughout.
+ * Uses semantic theme/sidebar tokens for consistent light/dark theming.
+ * Lucide icons are used throughout; no emoji glyphs.
  */
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   LayoutDashboard,
   FileText,
+  MessageSquare,
   Paintbrush,
   Image,
   Tags,
@@ -20,8 +21,11 @@ import {
   Settings,
   Store,
   X,
+  LogOut,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useAppDispatch } from '@/lib/store';
+import { logout_user } from '@/lib/slices/user_slice';
 
 interface NavItem {
   href: string;
@@ -32,6 +36,7 @@ interface NavItem {
 const nav_items: NavItem[] = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/content', label: 'Content', icon: FileText },
+  { href: '/comments', label: 'Comments', icon: MessageSquare },
   { href: '/builder', label: 'Builder', icon: Paintbrush },
   { href: '/media', label: 'Media', icon: Image },
   { href: '/taxonomy', label: 'Taxonomy', icon: Tags },
@@ -43,34 +48,50 @@ const nav_items: NavItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const [isOpen, set_isOpen] = useState(false);
+  const [is_logging_out, set_is_logging_out] = useState(false);
+
+  /** Log out on server, clear client auth state, then return to login. */
+  async function handle_logout(): Promise<void> {
+    set_is_logging_out(true);
+    try {
+      await dispatch(logout_user()).unwrap();
+    } catch {
+      // Reducer clears local auth state on rejection; still redirect to login.
+    } finally {
+      set_isOpen(false);
+      set_is_logging_out(false);
+      router.replace('/login');
+    }
+  }
 
   return (
     <>
       <button
         onClick={() => set_isOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-md text-white drop-shadow"
-        style={{ backgroundColor: '#2185d5' }}
+        className="fixed left-4 top-4 z-50 rounded-md bg-primary p-2 text-primary-foreground drop-shadow focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 lg:hidden"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
+        type="button"
       >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
+        {isOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
       </button>
 
       <aside
-        className={`w-64 min-h-screen p-4 transition-transform duration-300 ${
+        className={`flex min-h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar p-4 text-sidebar-foreground transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen`}
-        style={{ backgroundColor: '#303841' }}
+        } lg:sticky lg:top-0 lg:h-screen lg:translate-x-0`}
         role="navigation"
         aria-label="Main navigation"
       >
         <div className="mb-8">
-          <h1 className="text-xl font-bold text-white">Typepress</h1>
-          <p className="text-sm" style={{ color: '#2185d5' }}>Admin Panel</p>
+          <h1 className="text-xl font-bold text-sidebar-foreground">Typepress</h1>
+          <p className="text-sm text-sidebar-primary">Admin Panel</p>
         </div>
 
-        <nav className="space-y-1">
+        <nav className="space-y-1 flex-1">
           {nav_items.map((item) => {
             const is_active = pathname === item.href ||
               (item.href !== '/' && pathname.startsWith(item.href));
@@ -81,12 +102,11 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 onClick={() => set_isOpen(false)}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                className={`flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-sidebar-ring/50 ${
                   is_active
-                    ? 'text-white drop-shadow-md'
-                    : 'text-gray-300 hover:text-white'
+                    ? 'bg-sidebar-primary text-sidebar-primary-foreground drop-shadow-md'
+                    : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                 }`}
-                style={is_active ? { backgroundColor: '#2185d5' } : {}}
                 aria-current={is_active ? 'page' : undefined}
               >
                 <Icon size={20} className="shrink-0" aria-hidden="true" />
@@ -95,11 +115,24 @@ export function Sidebar() {
             );
           })}
         </nav>
+
+        <div className="mt-4 border-t border-sidebar-border pt-4">
+          <button
+            type="button"
+            onClick={() => { void handle_logout(); }}
+            disabled={is_logging_out}
+            className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-sidebar-ring/50 disabled:opacity-60"
+            aria-label="Log out"
+          >
+            <LogOut size={20} className="shrink-0" aria-hidden="true" />
+            <span>{is_logging_out ? 'Logging out...' : 'Logout'}</span>
+          </button>
+        </div>
       </aside>
 
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="fixed inset-0 z-30 bg-foreground/40 lg:hidden"
           onClick={() => set_isOpen(false)}
           aria-hidden="true"
         />

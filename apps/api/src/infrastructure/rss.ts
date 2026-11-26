@@ -1,19 +1,28 @@
-import { prisma } from '@typepress/db';
+import { db, contents, users } from '@typepress/db';
+import { and, desc, eq, type SQL } from 'drizzle-orm';
 
 /**
  * RSS Feed Generator — Creates RSS 2.0 feeds for content.
  */
 export class RSSFeedGenerator {
   async generate(content_type?: string): Promise<string> {
-    const where: Record<string, unknown> = { status: 'PUBLISHED' };
-    if (content_type) where.type = content_type;
+    const conditions: SQL[] = [eq(contents.status, 'PUBLISHED')];
+    if (content_type) conditions.push(eq(contents.type, content_type));
 
-    const contents = await prisma.content.findMany({
-      where,
-      orderBy: { created_at: 'desc' },
-      take: 50,
-      include: { author: { select: { name: true } } },
-    });
+    const rows = await db
+      .select({
+        slug: contents.slug,
+        title: contents.title,
+        meta: contents.meta,
+        published_at: contents.published_at,
+        created_at: contents.created_at,
+        author_name: users.name,
+      })
+      .from(contents)
+      .innerJoin(users, eq(contents.author_id, users.id))
+      .where(and(...conditions))
+      .orderBy(desc(contents.created_at))
+      .limit(50);
 
     const site_url = process.env.SITE_URL || 'http://localhost:4001';
     const site_title = 'Typepress';
@@ -27,10 +36,10 @@ export class RSSFeedGenerator {
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>`;
 
-    for (const content of contents) {
+    for (const content of rows) {
       const meta = content.meta as Record<string, unknown>;
       const excerpt = (meta.excerpt as string) || '';
-      const pub_date = content.published_at || content.created_at;
+      const pub_date = content.published_at ?? content.created_at;
 
       xml += `
     <item>
@@ -39,7 +48,7 @@ export class RSSFeedGenerator {
       <guid>${site_url}/${content.slug}</guid>
       <description><![CDATA[${excerpt}]]></description>
       <pubDate>${pub_date.toUTCString()}</pubDate>
-      <author>${content.author.name || 'Unknown'}</author>
+      <author>${content.author_name ?? 'Unknown'}</author>
     </item>`;
     }
 

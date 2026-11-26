@@ -28,12 +28,12 @@ function ContainerInner({ background, padding, flexDirection, gap }: ContainerBl
         flexDirection,
         gap: `${gap}px`,
         minHeight: '60px',
-        border: '1px dashed #e5e7eb',
+        border: '1px dashed var(--border)',
         borderRadius: '6px',
       }}
     >
       <div className="flex-1 min-h-[40px] flex items-center justify-center">
-        <p className="text-gray-400 text-sm text-center py-4">
+        <p className="text-muted-foreground text-sm text-center py-4">
           Drag blocks here
         </p>
       </div>
@@ -47,7 +47,7 @@ export function ContainerBlock(props: ContainerBlockProps) {
 
 ContainerBlock.craft = {
   props: {
-    background: '#ffffff',
+    background: '#ffffff', // Content default; user-editable.
     padding: 16,
     flexDirection: 'column',
     gap: 12,

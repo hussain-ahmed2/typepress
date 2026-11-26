@@ -23,6 +23,7 @@ export function ButtonBlock({ text, variant, color, link, borderRadius }: Button
     borderRadius: `${borderRadius}px`,
     border: variant === 'outline' ? `2px solid ${color}` : 'none',
     backgroundColor: variant === 'solid' ? color : 'transparent',
+    // Contrast fallback for user-selected solid button colors.
     color: variant === 'solid' ? '#ffffff' : color,
     padding: '10px 24px',
     fontSize: '16px',
@@ -47,7 +48,7 @@ ButtonBlock.craft = {
   props: {
     text: 'Click me',
     variant: 'solid',
-    color: '#3b82f6',
+    color: '#3b82f6', // Content default; user-editable.
     link: '',
     borderRadius: 8,
   } as ButtonBlockProps,

@@ -104,7 +104,7 @@ typepress/
 apps/* → packages/* (never the reverse)
 packages/shared-types → no dependencies (leaf node)
 packages/core → packages/shared-types, fastify
-packages/db → @prisma/client
+packages/db → drizzle-orm, pg
 packages/plugin-sdk → packages/core, packages/shared-types
 packages/theme-sdk → packages/shared-types, react
 ```
@@ -231,20 +231,19 @@ apps/api/src/infrastructure/
 
 ---
 
-## Database (Prisma)
+## Database (Drizzle ORM)
 
 ### Schema Conventions
-- Use `cuid()` for primary keys (URL-safe, sortable)
-- Use `@default(now())` for timestamps
-- Use `@updatedAt` for updated fields
-- JSONB columns for flexible/meta data (Content.meta, User.capabilities)
-- Index foreign keys and frequently queried fields
-- Use enums for fixed values (UserRole, ContentStatus)
+- Use `text` IDs with `randomUUID()`/generator in app code (or explicit defaults) for primary keys; keep IDs typed and consistent.
+- Use `timestamp(...).defaultNow()` for created timestamps; set/update `updated_at` explicitly or via schema `$onUpdate`.
+- JSONB columns for flexible/meta data (`Content.meta`, `User.capabilities`) with typed `$type<...>()`.
+- Index foreign keys and frequently queried fields.
+- Use pgEnum for DB enums where schema already uses them; export app-level const/type pairs for compatibility.
 
 ### Migration Rules
-- Never edit a generated migration — create a new one
-- Name migrations descriptively: `add_seo_fields`, `create_media_table`
-- Test migrations roll back cleanly before committing
+- Schema source of truth: `packages/db/src/schema.ts`. Drizzle config: `packages/db/drizzle.config.ts`.
+- Generate migrations with `pnpm db:generate` (`drizzle-kit generate`); apply with `pnpm db:migrate` (`drizzle-kit migrate`).
+- Never edit a generated migration — create a new one. Test migrations on a clean/local DB before committing.
 
 ---
 
@@ -347,22 +346,53 @@ refactor(core): convert PluginManager to class
 
 ## Performance Rules
 
-- Lazy-load heavy modules (Prisma client, Sharp, etc.)
-- Use connection pooling for database
+- Lazy-load heavy modules (DB client, Sharp, etc.)
+- Use connection pooling for database (pg Pool / Drizzle)
 - Cache expensive queries with Redis
 - Paginate all list endpoints (default: 20 items)
-- Use `select` in Prisma to avoid fetching unused columns
+- Select only required columns in Drizzle queries; avoid loading large JSON/meta blobs unless needed
 
 ---
 
-## Security Rules
+## Security Rules (OWASP-aligned, mandatory)
 
-- Never commit `.env` files
-- Hash passwords with bcrypt (cost factor >= 12)
-- Validate all user input with Zod
-- Use parameterized queries (Prisma handles this)
-- Set CORS origins explicitly, never `*` in production
-- Rate-limit auth endpoints
+All new features and changes MUST follow these rules. Review against OWASP Top 10 before merging.
+
+### Authentication & Passwords
+- **Hash passwords with argon2id** (preferred). Use OWASP-recommended parameters; never use MD5/SHA1/plain bcrypt for new hashes. Support transparent legacy-hash verification and rehash-on-login when migrating algorithms.
+- Enforce strong password policy: minimum length 12+, reject common/breached patterns where practical; avoid overly restrictive composition rules that harm usability.
+- Use generic auth errors to prevent user enumeration (login/reset/verify/resend).
+- Rate-limit and add abuse protection for login, registration, password reset, verification, token refresh, and other sensitive endpoints.
+- Rotate/revoke sessions on password reset and other credential/security-sensitive changes. Invalidate sessions safely on logout.
+- Store auth tokens only as hashes; tokens must be short-lived, single-use where applicable, and never logged.
+
+### Access Control
+- Deny by default. Every endpoint must have explicit authn/authz checks (`require_auth`, `require_capability`, ownership checks).
+- Enforce object-level authorization server-side; never trust client IDs/roles alone.
+- Keep capability checks centralized and typed; do not bypass them in GraphQL, sockets, jobs, or admin UI.
+
+### Input, Output, and Injection
+- Validate all external input with Zod (body/query/params/headers/env where relevant) before use.
+- Use parameterized Drizzle queries/sql tags; never string-concatenate SQL. For raw SQL, use `sql` placeholders and typed result mapping.
+- Prevent XSS: escape/sanitize untrusted content before rendering. Never use `dangerouslySetInnerHTML` without strict sanitization.
+- Prevent SSRF/path traversal/command injection: validate URLs, file paths, filenames, MIME/types, and never pass untrusted input to shell commands.
+
+### Data Protection & Secrets
+- Never commit `.env` files or secrets. Use env vars/config validation; fail closed for missing critical secrets in production.
+- Do not log secrets, passwords, tokens, session IDs, or sensitive PII. Redact sensitive fields in logs/errors.
+- Use HTTPS/TLS in production; set secure cookie flags (`HttpOnly`, `Secure`, `SameSite` as appropriate), HSTS, and strict CORS origins (never `*` in production).
+- Encrypt/protect sensitive data at rest/in transit as required; minimize stored PII.
+
+### API & Platform Security
+- Set secure headers (CSP, X-Content-Type-Options, frame protections, referrer policy) appropriate for admin/renderer/API.
+- Protect against CSRF for cookie-based auth; validate Origin/Referer for unsafe methods where applicable.
+- Apply request size limits, upload validation (size/type/magic bytes), and pagination limits.
+- Add GraphQL/socket abuse controls: depth/complexity limits, authz per field/event, payload validation, rate limits.
+- Keep dependencies updated; address high/critical vulnerabilities. Prefer maintained, well-reviewed packages.
+
+### Security Testing
+- Add tests for authz failures, injection attempts, upload/path traversal, token abuse, rate limits, and enumeration-sensitive endpoints.
+- Treat security bugs as blockers; fix root cause and add regression tests.
 
 ---
 
@@ -374,7 +404,8 @@ refactor(core): convert PluginManager to class
 | `AGENTS.md` | This file — coding instructions |
 | `.env.example` | Environment variable template |
 | `docker/docker-compose.yml` | Infrastructure services |
-| `packages/db/prisma/schema.prisma` | Database schema |
+| `packages/db/src/schema.ts` | Drizzle database schema |
+| `packages/db/drizzle.config.ts` | Drizzle Kit config |
 | `turbo.json` | Build pipeline config |
 | `tsconfig.base.json` | Shared TypeScript config |
 | `vitest.config.ts` | Test configuration |

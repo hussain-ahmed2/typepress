@@ -1,6 +1,14 @@
+import { resolve } from 'node:path';
 import { defineConfig } from 'vitest/config';
 
+const admin_src = resolve(import.meta.dirname, 'apps/admin/src');
+
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': admin_src,
+    },
+  },
   test: {
     globals: true,
     environment: 'node',

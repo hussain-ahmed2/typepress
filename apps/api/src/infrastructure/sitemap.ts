@@ -1,19 +1,20 @@
-import { prisma } from '@typepress/db';
+import { db, contents } from '@typepress/db';
+import { desc, eq } from 'drizzle-orm';
 
 /**
  * Sitemap Generator — Creates XML sitemaps for search engines.
  */
 export class SitemapGenerator {
   async generate(): Promise<string> {
-    const contents = await prisma.content.findMany({
-      where: { status: 'PUBLISHED' },
-      orderBy: { updated_at: 'desc' },
-      select: {
-        slug: true,
-        updated_at: true,
-        type: true,
-      },
-    });
+    const rows = await db
+      .select({
+        slug: contents.slug,
+        updated_at: contents.updated_at,
+        type: contents.type,
+      })
+      .from(contents)
+      .where(eq(contents.status, 'PUBLISHED'))
+      .orderBy(desc(contents.updated_at));
 
     const site_url = process.env.SITE_URL || 'http://localhost:4001';
 
@@ -28,7 +29,7 @@ export class SitemapGenerator {
     <priority>1.0</priority>
   </url>`;
 
-    for (const content of contents) {
+    for (const content of rows) {
       const priority = content.type === 'page' ? '0.8' : '0.6';
       xml += `
   <url>

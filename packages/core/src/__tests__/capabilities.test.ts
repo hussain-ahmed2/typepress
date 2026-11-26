@@ -3,8 +3,6 @@ import { CapabilityChecker } from '../capabilities';
 import type { Capability } from '@typepress/shared-types';
 
 describe('CapabilityChecker', () => {
-  const admin_caps: Capability[] = ['settings:manage', 'content:create', 'content:edit:any'];
-
   it('should check single capability', () => {
     const checker = new CapabilityChecker(['content:create', 'content:edit:own']);
 

@@ -1,4 +1,5 @@
-import { prisma } from '@typepress/db';
+import { count, desc, eq } from 'drizzle-orm';
+import { db, users } from '@typepress/db';
 import type { ApiResponse, PaginatedResponse } from '@typepress/shared-types';
 import type { UpdateUserInput, ListUsersQuery } from './user.validators';
 
@@ -13,21 +14,28 @@ interface UserListItem {
 export class UserService {
   async list(query: ListUsersQuery): Promise<PaginatedResponse<UserListItem>> {
     const { page, limit, role } = query;
-    const skip = (page - 1) * limit;
+    const offset = (page - 1) * limit;
 
-    const where: Record<string, unknown> = {};
-    if (role) where.role = role;
+    const where_clause = role ? eq(users.role, role) : undefined;
 
-    const [items, total] = await Promise.all([
-      prisma.user.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { created_at: 'desc' },
-        select: { id: true, email: true, name: true, role: true, created_at: true },
-      }),
-      prisma.user.count({ where }),
+    const [items, total_result] = await Promise.all([
+      db
+        .select({
+          id: users.id,
+          email: users.email,
+          name: users.name,
+          role: users.role,
+          created_at: users.created_at,
+        })
+        .from(users)
+        .where(where_clause)
+        .orderBy(desc(users.created_at))
+        .limit(limit)
+        .offset(offset),
+      db.select({ value: count() }).from(users).where(where_clause),
     ]);
+
+    const total = total_result[0]?.value ?? 0;
 
     return {
       success: true,
@@ -37,10 +45,19 @@ export class UserService {
   }
 
   async get_by_id(id: string): Promise<ApiResponse> {
-    const user = await prisma.user.findUnique({
-      where: { id },
-      select: { id: true, email: true, name: true, role: true, capabilities: true, created_at: true, updated_at: true },
-    });
+    const [user] = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        name: users.name,
+        role: users.role,
+        capabilities: users.capabilities,
+        created_at: users.created_at,
+        updated_at: users.updated_at,
+      })
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
 
     if (!user) {
       return { success: false, error: { code: 'NOT_FOUND', message: 'User not found' } };
@@ -50,33 +67,40 @@ export class UserService {
   }
 
   async update(id: string, data: UpdateUserInput): Promise<ApiResponse> {
-    const existing = await prisma.user.findUnique({ where: { id } });
+    const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.id, id)).limit(1);
     if (!existing) {
       return { success: false, error: { code: 'NOT_FOUND', message: 'User not found' } };
     }
 
-    const update_data: Record<string, unknown> = {};
+    // Build typed update payload; only include fields explicitly provided.
+    const update_data: Partial<Pick<typeof users.$inferInsert, 'name' | 'email' | 'role' | 'capabilities'>> = {};
     if (data.name !== undefined) update_data.name = data.name;
     if (data.email !== undefined) update_data.email = data.email;
     if (data.role !== undefined) update_data.role = data.role;
     if (data.capabilities !== undefined) update_data.capabilities = data.capabilities;
 
-    const user = await prisma.user.update({
-      where: { id },
-      data: update_data,
-      select: { id: true, email: true, name: true, role: true, created_at: true },
-    });
+    const [user] = await db
+      .update(users)
+      .set(update_data)
+      .where(eq(users.id, id))
+      .returning({
+        id: users.id,
+        email: users.email,
+        name: users.name,
+        role: users.role,
+        created_at: users.created_at,
+      });
 
     return { success: true, data: user };
   }
 
   async delete(id: string): Promise<ApiResponse> {
-    const existing = await prisma.user.findUnique({ where: { id } });
+    const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.id, id)).limit(1);
     if (!existing) {
       return { success: false, error: { code: 'NOT_FOUND', message: 'User not found' } };
     }
 
-    await prisma.user.delete({ where: { id } });
+    await db.delete(users).where(eq(users.id, id));
     return { success: true, data: { message: 'User deleted' } };
   }
 }

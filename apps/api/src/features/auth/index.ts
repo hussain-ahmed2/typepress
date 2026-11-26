@@ -7,7 +7,7 @@
  *   GET  /api/auth/me       — Get current authenticated user
  *
  * Session management uses @fastify/session backed by Redis in production.
- * Password verification uses bcrypt (cost factor 12).
+ * Password hashing uses Argon2id (OWASP-aligned params) with legacy bcrypt rehash-on-login.
  */
 import type { FastifyInstance } from 'fastify';
 import type { FeaturePlugin } from '@typepress/core';

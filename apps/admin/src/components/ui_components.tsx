@@ -1,70 +1,149 @@
 /**
- * Page Wrapper — Responsive container for all dashboard pages.
+ * Shared UI wrappers — shadcn-based primitives with legacy-compatible APIs.
+ *
+ * These components provide stable exports for admin pages while aligning
+ * styling with semantic theme tokens and shadcn/ui components.
  */
-export function PageWrapper({ children, title }: { children: React.ReactNode; title?: string }) {
+import type { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
+import { Button as UiButton } from '@/components/ui/button';
+import { Input as UiInput } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
+/** Props for the responsive page wrapper. */
+interface PageWrapperProps {
+  children: ReactNode;
+  title?: string;
+}
+
+/** Props for the legacy Card wrapper. */
+interface CardProps {
+  children: ReactNode;
+  className?: string;
+}
+
+/** Column definition for ResponsiveTable. */
+interface ResponsiveTableColumn<T> {
+  key: string;
+  label: string;
+  render?: (item: T) => ReactNode;
+}
+
+/** Props for ResponsiveTable. */
+interface ResponsiveTableProps<T> {
+  data: T[];
+  columns: ResponsiveTableColumn<T>[];
+  render_mobile: (item: T) => ReactNode;
+}
+
+/** Supported legacy button variants. */
+type LegacyButtonVariant = 'primary' | 'secondary' | 'danger';
+
+/** Supported legacy button sizes. */
+type LegacyButtonSize = 'sm' | 'md' | 'lg';
+
+/** Props for the legacy Button wrapper. */
+interface ButtonProps {
+  children: ReactNode;
+  variant?: LegacyButtonVariant;
+  size?: LegacyButtonSize;
+  onClick?: () => void;
+  disabled?: boolean;
+  className?: string;
+  /** Optional button type for form usage; defaults to button. */
+  type?: 'button' | 'submit' | 'reset';
+}
+
+/** Props for the legacy Input wrapper. */
+interface InputProps {
+  label: string;
+  type?: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  required?: boolean;
+  error?: string;
+}
+
+/** Option shape for the legacy Select wrapper. */
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
+/** Props for the legacy Select wrapper. */
+interface SelectProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: SelectOption[];
+}
+
+/**
+ * Responsive container for dashboard pages.
+ */
+export function PageWrapper({ children, title }: PageWrapperProps) {
   return (
     <div className="px-4 sm:px-6 lg:px-8">
-      {title && <h1 className="text-2xl font-bold text-gray-900 mb-6">{title}</h1>}
+      {title ? <h1 className="mb-6 text-2xl font-bold text-foreground">{title}</h1> : null}
       {children}
     </div>
   );
 }
 
 /**
- * Card Component — Responsive card with drop shadow.
+ * Simple card surface with semantic background and drop shadow.
  */
-export function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+export function Card({ children, className = '' }: CardProps) {
   return (
-    <div className={`bg-white rounded-md drop-shadow ${className}`}>
+    <div className={cn('rounded-md bg-card text-card-foreground drop-shadow', className)}>
       {children}
     </div>
   );
 }
 
 /**
- * Responsive Table Wrapper — Shows table on desktop, cards on mobile.
+ * Responsive table that renders a table on desktop and cards on mobile.
  */
-export function ResponsiveTable<T>({
-  data,
-  columns,
-  render_mobile,
-}: {
-  data: T[];
-  columns: { key: string; label: string; render?: (item: T) => React.ReactNode }[];
-  render_mobile: (item: T) => React.ReactNode;
-}) {
+export function ResponsiveTable<T>({ data, columns, render_mobile }: ResponsiveTableProps<T>) {
   return (
     <Card>
-      {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
+      <div className="hidden overflow-x-auto md:block">
+        <Table>
+          <TableHeader className="bg-muted/50">
+            <TableRow>
               {columns.map((col) => (
-                <th key={col.key} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <TableHead key={col.key} className="px-6 py-3 text-xs uppercase text-muted-foreground">
                   {col.label}
-                </th>
+                </TableHead>
               ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {data.map((item, i) => (
-              <tr key={i} className="hover:bg-gray-50">
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((item, index) => (
+              <TableRow key={index} className="hover:bg-muted/50">
                 {columns.map((col) => (
-                  <td key={col.key} className="px-6 py-4 text-sm">
+                  <TableCell key={col.key} className="px-6 py-4 text-sm">
                     {col.render ? col.render(item) : String((item as Record<string, unknown>)[col.key])}
-                  </td>
+                  </TableCell>
                 ))}
-              </tr>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
 
-      {/* Mobile cards */}
-      <div className="md:hidden divide-y divide-gray-200">
-        {data.map((item, i) => (
-          <div key={i} className="p-4">
+      <div className="divide-y divide-border md:hidden">
+        {data.map((item, index) => (
+          <div key={index} className="p-4">
             {render_mobile(item)}
           </div>
         ))}
@@ -73,8 +152,22 @@ export function ResponsiveTable<T>({
   );
 }
 
+/** Maps legacy button variants to shadcn variants. */
+const BUTTON_VARIANT_MAP: Record<LegacyButtonVariant, 'default' | 'secondary' | 'destructive'> = {
+  primary: 'default',
+  secondary: 'secondary',
+  danger: 'destructive',
+};
+
+/** Maps legacy button sizes to shadcn sizes. */
+const BUTTON_SIZE_MAP: Record<LegacyButtonSize, 'sm' | 'default' | 'lg'> = {
+  sm: 'sm',
+  md: 'default',
+  lg: 'lg',
+};
+
 /**
- * Button Component — Consistent button styling.
+ * Legacy-compatible button wrapper backed by shadcn Button.
  */
 export function Button({
   children,
@@ -83,40 +176,24 @@ export function Button({
   onClick,
   disabled,
   className = '',
-}: {
-  children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
-  onClick?: () => void;
-  disabled?: boolean;
-  className?: string;
-}) {
-  const base = 'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:opacity-50';
-  const variants = {
-    primary: 'text-white',
-    secondary: 'text-gray-700 bg-gray-100 hover:bg-gray-200',
-    danger: 'text-white bg-red-600 hover:bg-red-700',
-  };
-  const sizes = {
-    sm: 'px-3 py-1.5 text-xs',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base',
-  };
-
+  type = 'button',
+}: ButtonProps) {
   return (
-    <button
+    <UiButton
+      type={type}
+      variant={BUTTON_VARIANT_MAP[variant]}
+      size={BUTTON_SIZE_MAP[size]}
       onClick={onClick}
       disabled={disabled}
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
-      style={variant === 'primary' ? { backgroundColor: '#2185d5' } : undefined}
+      className={cn('rounded-md drop-shadow-sm', className)}
     >
       {children}
-    </button>
+    </UiButton>
   );
 }
 
 /**
- * Input Component — Consistent input styling.
+ * Legacy-compatible labeled input wrapper backed by shadcn Input.
  */
 export function Input({
   label,
@@ -126,55 +203,40 @@ export function Input({
   placeholder,
   required,
   error,
-}: {
-  label: string;
-  type?: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder?: string;
-  required?: boolean;
-  error?: string;
-}) {
+}: InputProps) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-      <input
+    <div className="space-y-1">
+      <Label className="text-sm font-medium text-foreground">{label}</Label>
+      <UiInput
         type={type}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         required={required}
-        className={`w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 ${error ? 'border-red-500' : 'border-gray-300'}`}
+        aria-invalid={error ? true : undefined}
+        className={cn(error && 'border-destructive focus-visible:ring-destructive/30')}
       />
-      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+      {error ? <p className="text-xs text-destructive">{error}</p> : null}
     </div>
   );
 }
 
 /**
- * Select Component — Consistent select styling.
+ * Legacy-compatible labeled native select with semantic styling.
  */
-export function Select({
-  label,
-  value,
-  onChange,
-  options,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string }[];
-}) {
+export function Select({ label, value, onChange, options }: SelectProps) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+    <div className="space-y-1">
+      <Label className="text-sm font-medium text-foreground">{label}</Label>
       <select
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+        onChange={(event) => onChange(event.target.value)}
+        className="border-input bg-background text-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-9 w-full rounded-md border px-3 py-2 text-sm outline-none focus-visible:ring-[3px]"
       >
         {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>{opt.label}</option>
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
         ))}
       </select>
     </div>

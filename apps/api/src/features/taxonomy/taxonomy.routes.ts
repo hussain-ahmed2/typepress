@@ -1,10 +1,10 @@
 /**
  * Taxonomy Routes — HTTP handlers for taxonomy CRUD.
  *
- * Read endpoints are public. Write endpoints require authentication.
+ * Read endpoints are public. Write endpoints require authentication + capability checks.
  */
 import type { FastifyInstance } from 'fastify';
-import { validate_body, validate_query, require_auth } from '../../infrastructure/middleware';
+import { validate_body, validate_query, require_auth, require_any_capability } from '../../infrastructure/middleware';
 import { create_taxonomy_schema, update_taxonomy_schema, list_taxonomy_schema } from './taxonomy.validators';
 import { TaxonomyService } from './taxonomy.service';
 
@@ -31,9 +31,9 @@ export async function taxonomy_routes(app: FastifyInstance) {
     return reply.send(result);
   });
 
-  /** POST / — Create taxonomy (auth required) */
+  /** POST / — Create taxonomy (requires taxonomy:manage; accepts legacy content:edit:any) */
   app.post('/', {
-    preHandler: [require_auth, validate_body(create_taxonomy_schema)],
+    preHandler: [require_auth, require_any_capability(['taxonomy:manage', 'content:edit:any']), validate_body(create_taxonomy_schema)],
   }, async (request, reply) => {
     const result = await taxonomy_service.create(request.body as never);
 
@@ -44,9 +44,9 @@ export async function taxonomy_routes(app: FastifyInstance) {
     return reply.status(201).send(result);
   });
 
-  /** PUT /:id — Update taxonomy (auth required) */
+  /** PUT /:id — Update taxonomy (requires taxonomy:manage; accepts legacy content:edit:any) */
   app.put('/:id', {
-    preHandler: [require_auth, validate_body(update_taxonomy_schema)],
+    preHandler: [require_auth, require_any_capability(['taxonomy:manage', 'content:edit:any']), validate_body(update_taxonomy_schema)],
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     const result = await taxonomy_service.update(id, request.body as never);
@@ -58,9 +58,9 @@ export async function taxonomy_routes(app: FastifyInstance) {
     return reply.send(result);
   });
 
-  /** DELETE /:id — Delete taxonomy (auth required) */
+  /** DELETE /:id — Delete taxonomy (requires taxonomy:manage; accepts legacy content:edit:any) */
   app.delete('/:id', {
-    preHandler: [require_auth],
+    preHandler: [require_auth, require_any_capability(['taxonomy:manage', 'content:edit:any'])],
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     const result = await taxonomy_service.delete(id);

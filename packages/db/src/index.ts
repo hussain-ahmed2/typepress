@@ -1,12 +1,13 @@
 /**
- * Database Package — Prisma client wrapper and type re-exports.
+ * Database Package — Drizzle ORM client, schema, and type exports.
  *
- * Provides a singleton PrismaClient instance with dev-mode global caching
- * to prevent multiple instances during hot reload.
- *
- * Re-exports all model types and enums for convenient access from other packages.
+ * Provides a singleton Drizzle db instance and re-exports schema tables/types
+ * for convenient typed access across the monorepo.
  */
-export { prisma } from './client';
-export { PrismaClient } from '@prisma/client';
-export type { Content, User, Media, Taxonomy, TaxonomyRelation, Session } from '@prisma/client';
-export { ContentStatus, UserRole } from '@prisma/client';
+export { db, pool } from './client';
+export type { Database } from './client';
+export * from './schema';
+
+// Temporary compatibility alias during Prisma -> Drizzle migration.
+// Prefer importing `db` in new/updated code.
+export { db as prisma } from './client';

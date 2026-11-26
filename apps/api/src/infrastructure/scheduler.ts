@@ -1,6 +1,7 @@
 import { create_logger } from "./logger";
 const log = create_logger("Scheduler");
-import { prisma } from '@typepress/db';
+import { db, contents } from '@typepress/db';
+import { and, eq, isNotNull, lte } from 'drizzle-orm';
 
 /**
  * Scheduler — Publishes scheduled content automatically.
@@ -31,22 +32,26 @@ export class Scheduler {
       const now = new Date();
 
       // Find content that should be published now
-      const to_publish = await prisma.content.findMany({
-        where: {
-          status: 'DRAFT',
-          published_at: { not: null, lte: now },
-        },
-      });
+      const to_publish = await db
+        .select({ id: contents.id, title: contents.title })
+        .from(contents)
+        .where(
+          and(
+            eq(contents.status, 'DRAFT'),
+            isNotNull(contents.published_at),
+            lte(contents.published_at, now),
+          ),
+        );
 
       if (to_publish.length === 0) return;
 
       log.info(` Publishing ${to_publish.length} scheduled post(s)`);
 
       for (const content of to_publish) {
-        await prisma.content.update({
-          where: { id: content.id },
-          data: { status: 'PUBLISHED' },
-        });
+        await db
+          .update(contents)
+          .set({ status: 'PUBLISHED' })
+          .where(eq(contents.id, content.id));
         log.info(` Published: "${content.title}" (${content.id})`);
       }
     } catch (error) {

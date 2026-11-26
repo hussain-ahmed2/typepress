@@ -3,8 +3,9 @@
  *
  * Tests block rendering, default props, and settings panels.
  * Uses a minimal Craft.js mock since full integration needs a browser.
+ * Hex values below are content-default assertions, not UI theme styling.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 // Mock Craft.js hooks for unit testing
 vi.mock('@craftjs/core', () => ({

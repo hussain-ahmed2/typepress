@@ -1,66 +1,17 @@
-import { create_logger } from "./infrastructure/logger";
-const log = create_logger("PluginLoader");
 /**
- * Plugin Loader — Discovers and loads plugins from the plugins/ directory.
+ * Plugin Loader — Backward-compatible wrapper around the real plugin runtime.
  *
- * Scans for directories containing typepress.plugin.json manifests.
- * Validates each manifest and loads the plugin's main entry point.
- *
- * Plugin directory structure:
- *   plugins/
- *     seo/
- *       typepress.plugin.json
- *       package.json
- *       src/index.ts
+ * The implementation lives in `./plugins/plugin_runtime.ts`. This file keeps the
+ * existing import path (`./plugin_loader`) stable for server/bootstrap code.
  */
-import { readdir } from 'fs/promises';
-import { join } from 'path';
-import type { Plugin } from '@typepress/core';
-import { PluginManager } from '@typepress/core';
-
-// Navigate from apps/api to the project root, then into plugins/
-const PLUGIN_DIR = join(process.cwd(), '..', '..', 'plugins');
+import type { FastifyInstance } from 'fastify';
+import type { PluginManager } from '@typepress/core';
+import { load_plugins as load_plugins_runtime } from './plugins';
 
 /**
- * Load all plugins from the plugins/ directory.
- * Each plugin must have a typepress.plugin.json manifest.
+ * Load all plugins from the configured plugins directory.
+ * Each plugin must contain a `typepress.plugin.json` manifest.
  */
-export async function load_plugins(plugin_manager: PluginManager): Promise<void> {
-  try {
-    const entries = await readdir(PLUGIN_DIR, { withFileTypes: true });
-
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-
-      const plugin_dir = join(PLUGIN_DIR, entry.name);
-      const manifest_path = join(plugin_dir, 'typepress.plugin.json');
-
-      try {
-        const manifest_raw = await import(manifest_path);
-        const manifest = manifest_raw.default ?? manifest_raw;
-
-        log.info(` Found plugin: ${manifest.name} v${manifest.version}`);
-
-        // For now, plugins are loaded as in-process modules
-        // Future: worker-thread isolation for untrusted plugins
-        const plugin: Plugin = {
-          name: manifest.name,
-          version: manifest.version,
-          register: async () => {
-            log.info(` Registered plugin: ${manifest.name}`);
-            // Plugin registration happens via hooks system
-          },
-        };
-
-        await plugin_manager.load(plugin);
-      } catch (error) {
-        log.error(` Failed to load plugin "${entry.name}":`, error);
-      }
-    }
-  } catch (error) {
-    // plugins/ directory might not exist yet — that's fine
-    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-      console.error('[PluginLoader] Error scanning plugins directory:', error);
-    }
-  }
+export async function load_plugins(plugin_manager: PluginManager, app?: FastifyInstance): Promise<void> {
+  await load_plugins_runtime(plugin_manager, app);
 }

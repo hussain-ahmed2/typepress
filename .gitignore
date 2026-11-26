@@ -5,6 +5,7 @@ node_modules/
 dist/
 .next/
 out/
+*.tsbuildinfo
 
 # Turbo
 .turbo/
@@ -38,3 +39,6 @@ coverage/
 # Docker
 docker/volumes/
 .commandcode/
+
+# Local agent artifacts
+.agents/

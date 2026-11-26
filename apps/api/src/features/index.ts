@@ -20,6 +20,9 @@ import { menu_feature } from './menu';
 import { user_feature } from './user';
 import { revision_feature } from './revision';
 import { search_feature } from './search';
+import { settings_feature } from './settings';
+import { comments_feature } from './comments';
+import { plugins_feature } from './plugins';
 
 const feature_registry = new FeatureRegistry();
 
@@ -31,6 +34,9 @@ feature_registry.register(menu_feature);
 feature_registry.register(user_feature);
 feature_registry.register(revision_feature);
 feature_registry.register(search_feature);
+feature_registry.register(settings_feature);
+feature_registry.register(comments_feature);
+feature_registry.register(plugins_feature);
 
 /**
  * Boot all features into the Fastify instance.

@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { validate_body, require_auth } from '../../infrastructure/middleware';
+import { validate_body, require_auth, require_any_capability } from '../../infrastructure/middleware';
 import { create_menu_schema, update_menu_schema, create_menu_item_schema } from './menu.validators';
 import { MenuService } from './menu.service';
 import '../../types';
@@ -20,7 +20,7 @@ export async function menu_routes(app: FastifyInstance) {
   });
 
   app.post('/', {
-    preHandler: [require_auth, validate_body(create_menu_schema)],
+    preHandler: [require_auth, require_any_capability(['menu:manage', 'settings:manage']), validate_body(create_menu_schema)],
   }, async (request, reply) => {
     const result = await menu_service.create(request.body as never);
     if (!result.success) return reply.status(400).send(result);
@@ -28,7 +28,7 @@ export async function menu_routes(app: FastifyInstance) {
   });
 
   app.put('/:id', {
-    preHandler: [require_auth, validate_body(update_menu_schema)],
+    preHandler: [require_auth, require_any_capability(['menu:manage', 'settings:manage']), validate_body(update_menu_schema)],
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     const result = await menu_service.update(id, request.body as never);
@@ -37,7 +37,7 @@ export async function menu_routes(app: FastifyInstance) {
   });
 
   app.delete('/:id', {
-    preHandler: [require_auth],
+    preHandler: [require_auth, require_any_capability(['menu:manage', 'settings:manage'])],
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     const result = await menu_service.delete(id);
@@ -46,7 +46,7 @@ export async function menu_routes(app: FastifyInstance) {
   });
 
   app.post('/:id/items', {
-    preHandler: [require_auth, validate_body(create_menu_item_schema)],
+    preHandler: [require_auth, require_any_capability(['menu:manage', 'settings:manage']), validate_body(create_menu_item_schema)],
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     const result = await menu_service.add_item(id, request.body as never);
@@ -55,7 +55,7 @@ export async function menu_routes(app: FastifyInstance) {
   });
 
   app.delete('/items/:id', {
-    preHandler: [require_auth],
+    preHandler: [require_auth, require_any_capability(['menu:manage', 'settings:manage'])],
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     const result = await menu_service.delete_item(id);

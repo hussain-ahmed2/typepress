@@ -1,19 +1,38 @@
 /**
  * Admin Pages E2E Tests — Comprehensive testing of all admin functionality.
+ *
+ * Gated behind RUN_E2E=true or E2E_API_BASE to avoid failures in clean CI envs.
+ * Run: RUN_E2E=true pnpm test:run
  */
 import { describe, it, expect, beforeAll } from 'vitest';
 
-const API_BASE = 'http://localhost:8000';
+/** Env gate: these tests require a running API server. */
+const RUN_E2E: boolean = process.env.RUN_E2E === 'true' || Boolean(process.env.E2E_API_BASE);
+/** Base URL for the running API under test. */
+const API_BASE: string = process.env.E2E_API_BASE ?? 'http://localhost:8000';
 
-async function api_request(path: string, options: RequestInit = {}) {
+/** Loose API response shape for e2e assertions. */
+interface E2eApiResponse {
+  success?: boolean;
+  status?: string;
+  uptime?: number;
+  features?: string[];
+  plugins?: unknown[];
+  pagination?: { page: number; limit?: number; total?: number; total_pages?: number };
+  data?: unknown;
+  error?: { code: string; message?: string };
+  [key: string]: unknown;
+}
+
+async function api_request(path: string, options: RequestInit = {}): Promise<E2eApiResponse> {
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options.headers },
   });
-  return response.json();
+  return (await response.json()) as E2eApiResponse;
 }
 
-describe('Admin Pages E2E', () => {
+describe.runIf(RUN_E2E)('Admin Pages E2E', () => {
   beforeAll(async () => {
     const health = await api_request('/health');
     expect(health.status).toBe('ok');
@@ -36,7 +55,7 @@ describe('Admin Pages E2E', () => {
 
     it('should have all plugins loaded', async () => {
       const result = await api_request('/health');
-      expect(result.plugins.length).toBeGreaterThanOrEqual(18);
+      expect(result.plugins?.length).toBeGreaterThanOrEqual(18);
     });
   });
 
@@ -45,7 +64,7 @@ describe('Admin Pages E2E', () => {
       const result = await api_request('/api/content?page=1&limit=10');
       expect(result.success).toBe(true);
       expect(result.pagination).toBeDefined();
-      expect(result.pagination.page).toBe(1);
+      expect(result.pagination?.page).toBe(1);
     });
 
     it('should filter by type', async () => {
@@ -56,7 +75,7 @@ describe('Admin Pages E2E', () => {
     it('should return 404 for nonexistent content', async () => {
       const result = await api_request('/api/content/nonexistent-id');
       expect(result.success).toBe(false);
-      expect(result.error.code).toBe('NOT_FOUND');
+      expect(result.error?.code).toBe('NOT_FOUND');
     });
   });
 
@@ -102,7 +121,8 @@ describe('Admin Pages E2E', () => {
         method: 'POST',
         body: JSON.stringify({ query: '{ health { status uptime } }' }),
       });
-      expect(result.data.health.status).toBe('ok');
+      const data = result.data as { health?: { status?: string } } | undefined;
+      expect(data?.health?.status).toBe('ok');
     });
   });
 

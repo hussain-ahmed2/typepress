@@ -4,7 +4,9 @@
  * Generates breadcrumb trails for content based on taxonomy hierarchy.
  * Includes Schema.org structured data for SEO.
  */
-import { prisma } from '@typepress/db';
+import { db, contents, taxonomies, taxonomy_relations } from '@typepress/db';
+import { eq } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 
 export interface BreadcrumbItem {
   name: string;
@@ -36,39 +38,45 @@ export class BreadcrumbService {
    * Generate breadcrumbs for a content item.
    */
   async generate(content_id: string): Promise<BreadcrumbItem[]> {
-    const content = await prisma.content.findUnique({
-      where: { id: content_id },
-      include: {
-        taxonomies: {
-          include: {
-            taxonomy: {
-              include: { parent: true },
-            },
-          },
-        },
-      },
-    });
+    const [content] = await db
+      .select({ id: contents.id, title: contents.title, slug: contents.slug })
+      .from(contents)
+      .where(eq(contents.id, content_id))
+      .limit(1);
 
     if (!content) return [];
+
+    // Self-join to fetch parent taxonomy in one query.
+    const parent_taxonomies = alias(taxonomies, 'parent_taxonomy');
+    const relations = await db
+      .select({
+        taxonomy_name: taxonomies.name,
+        taxonomy_slug: taxonomies.slug,
+        parent_name: parent_taxonomies.name,
+        parent_slug: parent_taxonomies.slug,
+      })
+      .from(taxonomy_relations)
+      .innerJoin(taxonomies, eq(taxonomy_relations.taxonomy_id, taxonomies.id))
+      .leftJoin(parent_taxonomies, eq(taxonomies.parent_id, parent_taxonomies.id))
+      .where(eq(taxonomy_relations.content_id, content_id));
 
     const breadcrumbs: BreadcrumbItem[] = [
       { name: 'Home', slug: '', url: this.site_url },
     ];
 
     // Add taxonomy parents to breadcrumbs
-    for (const rel of content.taxonomies) {
-      const taxonomy = rel.taxonomy;
-      if (taxonomy.parent) {
+    for (const rel of relations) {
+      if (rel.parent_name && rel.parent_slug) {
         breadcrumbs.push({
-          name: taxonomy.parent.name,
-          slug: taxonomy.parent.slug,
-          url: `${this.site_url}/taxonomy/${taxonomy.parent.slug}`,
+          name: rel.parent_name,
+          slug: rel.parent_slug,
+          url: `${this.site_url}/taxonomy/${rel.parent_slug}`,
         });
       }
       breadcrumbs.push({
-        name: taxonomy.name,
-        slug: taxonomy.slug,
-        url: `${this.site_url}/taxonomy/${taxonomy.slug}`,
+        name: rel.taxonomy_name,
+        slug: rel.taxonomy_slug,
+        url: `${this.site_url}/taxonomy/${rel.taxonomy_slug}`,
       });
     }
 

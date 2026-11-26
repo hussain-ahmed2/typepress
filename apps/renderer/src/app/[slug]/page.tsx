@@ -1,75 +1,82 @@
 /**
- * Content Page — Renders a single content item by slug.
+ * Content Page — Public single-content route.
  *
- * Uses dynamic route matching. Fetches content from the API by slug
- * and renders it with a basic article layout.
+ * Renders published content by slug with ISR, SEO metadata, and theme slots.
  */
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-const API_BASE = process.env.API_URL || 'http://localhost:8000';
+import { get_content_by_slug } from '@/lib/api';
+import { get_theme_slot } from '@/theme';
 
-interface ContentDetail {
-  id: string;
-  title: string;
-  slug: string;
-  type: string;
-  status: string;
-  meta: { excerpt?: string; featured_image?: string; [key: string]: unknown };
-  author_name: string | null;
-  taxonomies: { id: string; name: string; slug: string; type: string }[];
-  created_at: string;
-  updated_at: string;
-}
+// ISR window for content detail; keep aligned with API fetch revalidation.
+export const revalidate = 60;
 
-async function get_content(slug: string): Promise<ContentDetail | null> {
-  try {
-    const res = await fetch(`${API_BASE}/api/content/slug/${slug}`);
-    if (!res.ok) return null;
-    const data = (await res.json()) as { data?: ContentDetail };
-    return data.data || null;
-  } catch {
-    return null;
-  }
-}
-
-export default async function ContentPage({
-  params,
-}: {
+interface ContentPageProps {
   params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const content = await get_content(slug);
+}
 
-  if (!content) {
+/** Build SEO metadata for a content item. */
+export async function generateMetadata({ params }: ContentPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const content = await get_content_by_slug(slug);
+
+  if (!content || content.status !== 'PUBLISHED') {
+    return {
+      title: 'Content not found',
+      description: 'The requested content could not be found.',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
+  const description =
+    typeof content.meta.excerpt === 'string' && content.meta.excerpt.trim().length > 0
+      ? content.meta.excerpt
+      : `Read ${content.title} on Typepress.`;
+  const canonical_path = `/${content.slug}`;
+
+  return {
+    title: content.title,
+    description,
+    alternates: {
+      canonical: canonical_path,
+    },
+    openGraph: {
+      type: 'article',
+      title: content.title,
+      description,
+      url: canonical_path,
+      publishedTime: content.created_at,
+      modifiedTime: content.updated_at,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: content.title,
+      description,
+    },
+  };
+}
+
+export default async function ContentPage({ params }: ContentPageProps) {
+  const { slug } = await params;
+  const content = await get_content_by_slug(slug);
+
+  // Only published content is publicly renderable.
+  if (!content || content.status !== 'PUBLISHED') {
     notFound();
   }
 
-  return (
-    <article className="max-w-4xl mx-auto px-4 py-12">
-      <header className="mb-8">
-        <h1 className="text-4xl font-bold">{content.title}</h1>
-        <div className="flex items-center gap-4 mt-4 text-sm text-gray-500">
-          <span>{content.author_name}</span>
-          <span>·</span>
-          <time>{new Date(content.created_at).toLocaleDateString()}</time>
-        </div>
-        {content.taxonomies.length > 0 && (
-          <div className="flex gap-2 mt-4">
-            {content.taxonomies.map((t) => (
-              <span
-                key={t.id}
-                className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm"
-              >
-                {t.name}
-              </span>
-            ))}
-          </div>
-        )}
-      </header>
+  const SinglePostSlot = get_theme_slot('single_post');
 
-      <div className="prose prose-lg max-w-none">
-        <p className="text-gray-600 text-lg">{content.meta?.excerpt}</p>
-      </div>
-    </article>
+  return (
+    <SinglePostSlot
+      content={content}
+      taxonomies={content.taxonomies}
+      site_title="Typepress"
+      site_description="A TypeScript-native CMS for publishing modern content."
+    />
   );
 }

@@ -1,11 +1,28 @@
 /**
- * Providers Component — Wraps the app with Redux Provider.
+ * Providers Component — App-level providers for admin.
+ *
+ * Wires Redux, tooltip context, and Sonner toasts so all dashboard
+ * components can use tooltips and toast notifications consistently.
  */
 'use client';
 
 import { Provider } from 'react-redux';
 import { store } from '@/lib/store';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { Toaster } from '@/components/ui/sonner';
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  return <Provider store={store}>{children}</Provider>;
+/** Props for the root provider tree. */
+interface ProvidersProps {
+  children: React.ReactNode;
+}
+
+export function Providers({ children }: ProvidersProps) {
+  return (
+    <Provider store={store}>
+      <TooltipProvider>
+        {children}
+        <Toaster />
+      </TooltipProvider>
+    </Provider>
+  );
 }

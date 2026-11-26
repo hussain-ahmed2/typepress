@@ -44,4 +44,20 @@ pnpm dev          # Start all apps
 pnpm build        # Build all apps
 pnpm lint         # Lint all apps
 pnpm format       # Format with Prettier
+pnpm test:run     # Run unit/integration tests (CI-safe default; env-gated e2e skipped)
+pnpm test:ci      # Verification gate: lint + build + test:run
+pnpm test:e2e     # Run localhost-dependent API e2e tests (requires running API on :8000)
+```
+
+### E2E Tests
+
+`apps/api/src/__tests__/admin_e2e.test.ts` and `builder_e2e.test.ts` require a running API server.
+They are skipped by default so `pnpm test:run` is reliable in clean/CI environments.
+
+```bash
+# Start API first, then:
+pnpm test:e2e
+
+# Or point at a custom API base URL (implies e2e enabled):
+E2E_API_BASE=http://localhost:8000 pnpm vitest run apps/api/src/__tests__/admin_e2e.test.ts
 ```

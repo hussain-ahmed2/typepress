@@ -130,6 +130,43 @@ export class EmailService {
       `,
     });
   }
+
+  /**
+   * Send a password reset email containing a one-time link.
+   * The raw token must never be logged; fallback logging only records recipient/subject.
+   */
+  async send_password_reset_email(user_email: string, reset_url: string): Promise<boolean> {
+    return this.send({
+      to: user_email,
+      subject: 'Reset your Typepress password',
+      html: `
+        <h2>Password Reset</h2>
+        <p>We received a request to reset your password.</p>
+        <p><a href="${reset_url}">Reset your password</a></p>
+        <p>This link expires in 1 hour and can only be used once.</p>
+        <p>If you did not request this, you can ignore this email.</p>
+      `,
+      text: `Reset your Typepress password: ${reset_url}\n\nThis link expires in 1 hour and can only be used once.`,
+    });
+  }
+
+  /**
+   * Send an email verification link.
+   * The raw token must never be logged; fallback logging only records recipient/subject.
+   */
+  async send_verification_email(user_email: string, verify_url: string): Promise<boolean> {
+    return this.send({
+      to: user_email,
+      subject: 'Verify your Typepress email',
+      html: `
+        <h2>Verify Your Email</h2>
+        <p>Please confirm your email address to complete your account setup.</p>
+        <p><a href="${verify_url}">Verify email address</a></p>
+        <p>This link expires in 24 hours and can only be used once.</p>
+      `,
+      text: `Verify your Typepress email: ${verify_url}\n\nThis link expires in 24 hours and can only be used once.`,
+    });
+  }
 }
 
 export const email_service = new EmailService();

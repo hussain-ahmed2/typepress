@@ -8,12 +8,4 @@ export const list_media_schema = z.object({
   limit: z.coerce.number().int().positive().max(100).default(20),
 });
 
-export const upload_media_schema = z.object({
-  filename: z.string().min(1),
-  mimetype: z.string().min(1),
-  size: z.number().int().positive(),
-  url: z.string().url(),
-});
-
 export type ListMediaQuery = z.infer<typeof list_media_schema>;
-export type UploadMediaInput = z.infer<typeof upload_media_schema>;

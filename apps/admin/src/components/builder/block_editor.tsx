@@ -2,84 +2,110 @@
  * Gutenberg-style Page Builder.
  *
  * Features:
- *   - Clean white canvas with subtle gray background
- *   - Block toolbar on hover/select (move, delete, drag)
- *   - Settings panel on the right
- *   - Block inserter (plus button)
- *   - Professional typography (Inter/system font)
- *   - Smooth transitions
- *   - Accessible (keyboard, ARIA)
+ * - Block inserter, canvas, and settings panel
+ * - Block toolbar (move, delete, settings)
+ * - Semantic theme tokens and accessible controls
+ * - Emits block changes for persistence
  */
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DragDropProvider, useDraggable, useDroppable } from '@dnd-kit/react';
-import { Trash2, Plus, ChevronUp, ChevronDown, Settings } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, Settings, Trash2 } from 'lucide-react';
+import type { BuilderBlock, BuilderBlockPropValue, BuilderBlockType } from '@typepress/shared-types';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import { block_types } from './block_types';
 import { BlockRenderer } from './block_renderer';
 import { SettingsPanel } from './settings_panel';
 
-export interface Block {
-  id: string;
-  type: string;
-  props: Record<string, unknown>;
-}
+/** Serializable block model used by the builder editor. */
+export type Block = BuilderBlock;
 
-function BlockToolbar({ block: _block, on_move_up, on_move_down, on_delete, on_select }: {
-  block: Block;
+/** Props for the block toolbar. */
+interface BlockToolbarProps {
   on_move_up: () => void;
   on_move_down: () => void;
   on_delete: () => void;
   on_select: () => void;
-}) {
+}
+
+/** Floating toolbar shown for the selected block. */
+function BlockToolbar({ on_move_up, on_move_down, on_delete, on_select }: BlockToolbarProps) {
   return (
-    <div className="absolute -top-10 left-0 flex items-center gap-1 bg-white rounded-md shadow-md border border-gray-200 px-2 py-1 z-10">
-      <button onClick={on_move_up} className="p-1 hover:bg-gray-100 rounded" title="Move up">
-        <ChevronUp size={16} />
-      </button>
-      <button onClick={on_move_down} className="p-1 hover:bg-gray-100 rounded" title="Move down">
-        <ChevronDown size={16} />
-      </button>
-      <div className="w-px h-4 bg-gray-200 mx-1" />
-      <button onClick={on_select} className="p-1 hover:bg-gray-100 rounded" title="Settings">
-        <Settings size={16} />
-      </button>
-      <button onClick={on_delete} className="p-1 hover:bg-red-50 text-red-500 rounded" title="Delete">
-        <Trash2 size={16} />
-      </button>
+    <div className="absolute -top-11 left-0 z-10 flex items-center gap-1 rounded-md border border-border bg-card p-1 drop-shadow">
+      <Button type="button" variant="ghost" size="icon-xs" onClick={on_move_up} aria-label="Move block up">
+        <ChevronUp size={16} aria-hidden="true" />
+      </Button>
+      <Button type="button" variant="ghost" size="icon-xs" onClick={on_move_down} aria-label="Move block down">
+        <ChevronDown size={16} aria-hidden="true" />
+      </Button>
+      <div className="mx-1 h-4 w-px bg-border" aria-hidden="true" />
+      <Button type="button" variant="ghost" size="icon-xs" onClick={on_select} aria-label="Open block settings">
+        <Settings size={16} aria-hidden="true" />
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon-xs"
+        onClick={on_delete}
+        aria-label="Delete block"
+        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+      >
+        <Trash2 size={16} aria-hidden="true" />
+      </Button>
     </div>
   );
 }
 
-function EditableBlock({ block, is_selected, on_select, on_move_up, on_move_down, on_delete }: {
+/** Props for an editable canvas block. */
+interface EditableBlockProps {
   block: Block;
   is_selected: boolean;
   on_select: () => void;
   on_move_up: () => void;
   on_move_down: () => void;
   on_delete: () => void;
-}) {
+}
+
+/** Renders a selectable, draggable block on the canvas. */
+function EditableBlock({
+  block,
+  is_selected,
+  on_select,
+  on_move_up,
+  on_move_down,
+  on_delete,
+}: EditableBlockProps) {
   const { ref } = useDraggable({ id: block.id });
 
   return (
     <div
       ref={ref}
       onClick={on_select}
-      className={`relative group ${is_selected ? 'ring-2 ring-blue-500' : 'hover:ring-1 hover:ring-gray-300'} ring-offset-2`}
+      className={cn(
+        'group relative rounded-sm ring-offset-background transition-shadow',
+        is_selected ? 'ring-2 ring-primary' : 'hover:ring-1 hover:ring-border',
+      )}
       role="button"
       tabIndex={0}
       aria-label={`${block.type} block`}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); on_select(); } }}
+      aria-pressed={is_selected}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          on_select();
+        }
+      }}
     >
-      {is_selected && (
+      {is_selected ? (
         <BlockToolbar
-          block={block}
           on_move_up={on_move_up}
           on_move_down={on_move_down}
           on_delete={on_delete}
           on_select={on_select}
         />
-      )}
+      ) : null}
       <div className="cursor-pointer">
         <BlockRenderer block={block} />
       </div>
@@ -87,85 +113,121 @@ function EditableBlock({ block, is_selected, on_select, on_move_up, on_move_down
   );
 }
 
-function Canvas({ children }: { children: React.ReactNode }) {
+/** Props for the droppable canvas. */
+interface CanvasProps {
+  children: React.ReactNode;
+}
+
+/** Main drop canvas for blocks. */
+function Canvas({ children }: CanvasProps) {
   const { ref, isDropTarget } = useDroppable({ id: 'canvas' });
 
   return (
     <div
       ref={ref}
-      className={`min-h-[600px] bg-white border ${isDropTarget ? 'border-blue-400 bg-blue-50' : 'border-gray-200'} rounded-lg p-8`}
+      className={cn(
+        'min-h-[600px] rounded-md border bg-card p-8 transition-colors',
+        isDropTarget ? 'border-primary bg-primary/5' : 'border-border',
+      )}
     >
       {children}
     </div>
   );
 }
 
-export function BlockEditor({ initial_blocks = [] }: { initial_blocks?: Block[] }) {
+/** Props for the block editor. */
+interface BlockEditorProps {
+  initial_blocks?: Block[];
+  /** Called whenever blocks change, for persistence by parent. */
+  onChange?: (blocks: Block[]) => void;
+}
+
+/** Block editor with inserter, canvas, and settings panel. */
+export function BlockEditor({ initial_blocks = [], onChange }: BlockEditorProps) {
   const [blocks, set_blocks] = useState<Block[]>(initial_blocks);
   const [selected_id, set_selected_id] = useState<string | null>(null);
-  
 
-  const add_block = (type: string) => {
-    const bt = block_types.find((b) => b.type === type);
-    if (!bt) return;
-    const new_block: Block = { id: `block_${Date.now()}`, type, props: { ...bt.defaultProps } };
-    set_blocks((prev) => [...prev, new_block]);
+  // Emit block changes to parent for save/persistence.
+  useEffect(() => {
+    onChange?.(blocks);
+  }, [blocks, onChange]);
+
+  /** Adds a new block of the requested type. */
+  function add_block(type: BuilderBlockType): void {
+    const block_type = block_types.find((candidate) => candidate.type === type);
+    if (!block_type) return;
+    const new_block: Block = {
+      id: `block_${Date.now()}`,
+      type,
+      props: { ...block_type.defaultProps },
+    };
+    set_blocks((previous) => [...previous, new_block]);
     set_selected_id(new_block.id);
-    
-  };
+  }
 
-  const update_block = (id: string, props: Record<string, unknown>) => {
-    set_blocks((prev) => prev.map((b) => (b.id === id ? { ...b, props: { ...b.props, ...props } } : b)));
-  };
+  /** Updates props for a block by id. */
+  function update_block(id: string, props: Record<string, BuilderBlockPropValue>): void {
+    set_blocks((previous) =>
+      previous.map((block) => (block.id === id ? { ...block, props: { ...block.props, ...props } } : block)),
+    );
+  }
 
-  const delete_block = (id: string) => {
-    set_blocks((prev) => prev.filter((b) => b.id !== id));
-    set_selected_id(null);
-  };
+  /** Deletes a block by id. */
+  function delete_block(id: string): void {
+    set_blocks((previous) => previous.filter((block) => block.id !== id));
+    set_selected_id((current) => (current === id ? null : current));
+  }
 
-  const move_block = (from: number, to: number) => {
-    if (to < 0 || to >= blocks.length) return;
-    const arr = [...blocks];
-    const [moved] = arr.splice(from, 1);
-    arr.splice(to, 0, moved!);
-    set_blocks(arr);
-  };
+  /** Moves a block within the list. */
+  function move_block(from_index: number, to_index: number): void {
+    if (to_index < 0 || to_index >= blocks.length) return;
+    set_blocks((previous) => {
+      const next_blocks = [...previous];
+      const [moved] = next_blocks.splice(from_index, 1);
+      if (!moved) return previous;
+      next_blocks.splice(to_index, 0, moved);
+      return next_blocks;
+    });
+  }
 
-  const selected = blocks.find((b) => b.id === selected_id) as Block | undefined;
+  const selected_block = blocks.find((block) => block.id === selected_id);
 
   return (
     <DragDropProvider>
-      <div className="flex gap-0 min-h-screen bg-gray-50">
-        {/* Sidebar - Block Inserter */}
-        <div className="w-72 bg-white border-r border-gray-200 flex-shrink-0">
-          <div className="p-4 border-b border-gray-200">
-            <h2 className="text-sm font-semibold text-gray-900">Blocks</h2>
+      <div className="flex min-h-[600px] flex-col bg-muted/30 lg:flex-row">
+        {/* Block inserter sidebar */}
+        <aside className="w-full shrink-0 border-b border-border bg-card lg:w-72 lg:border-b-0 lg:border-r">
+          <div className="border-b border-border p-4">
+            <h2 className="text-sm font-semibold text-foreground">Blocks</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Add blocks to the page canvas.</p>
           </div>
-          <div className="p-4 space-y-1">
-            {block_types.map((bt) => {
-              const Icon = bt.icon;
+          <div className="space-y-1 p-4">
+            {block_types.map((block_type) => {
+              const Icon = block_type.icon;
               return (
-                <button
-                  key={bt.type}
-                  onClick={() => add_block(bt.type)}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm text-left hover:bg-gray-100 transition-colors"
+                <Button
+                  key={block_type.type}
+                  type="button"
+                  variant="ghost"
+                  className="w-full justify-start gap-3 px-3 text-foreground"
+                  onClick={() => add_block(block_type.type)}
                 >
-                  <Icon size={20} className="text-gray-500" />
-                  <span className="text-gray-700">{bt.label}</span>
-                </button>
+                  <Icon size={18} className="text-muted-foreground" aria-hidden="true" />
+                  <span>{block_type.label}</span>
+                </Button>
               );
             })}
           </div>
-        </div>
+        </aside>
 
-        {/* Main Canvas */}
-        <div className="flex-1 p-8">
+        {/* Main canvas */}
+        <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
           <Canvas>
             {blocks.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-96 text-gray-400">
-                <Plus size={48} className="mb-4" />
-                <p className="text-lg">Click a block to add it</p>
-                <p className="text-sm">or drag from the sidebar</p>
+              <div className="flex min-h-96 flex-col items-center justify-center text-center text-muted-foreground">
+                <Plus size={48} className="mb-4" aria-hidden="true" />
+                <p className="text-lg font-medium text-foreground">Add your first block</p>
+                <p className="mt-1 text-sm">Select a block from the sidebar to start building.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -183,25 +245,26 @@ export function BlockEditor({ initial_blocks = [] }: { initial_blocks?: Block[] 
               </div>
             )}
           </Canvas>
-        </div>
+        </main>
 
-        {/* Settings Panel */}
-        <div className="w-80 bg-white border-l border-gray-200 flex-shrink-0">
-          <div className="p-4 border-b border-gray-200">
-            <h2 className="text-sm font-semibold text-gray-900">Settings</h2>
+        {/* Settings panel */}
+        <aside className="w-full shrink-0 border-t border-border bg-card lg:w-80 lg:border-l lg:border-t-0">
+          <div className="border-b border-border p-4">
+            <h2 className="text-sm font-semibold text-foreground">Settings</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Edit the selected block.</p>
           </div>
           <div className="p-4">
-            {selected ? (
+            {selected_block ? (
               <SettingsPanel
-                block={selected}
-                onUpdate={(props) => update_block(selected.id, props)}
-                onDelete={() => delete_block(selected.id)}
+                block={selected_block}
+                onUpdate={(props) => update_block(selected_block.id, props)}
+                onDelete={() => delete_block(selected_block.id)}
               />
             ) : (
-              <p className="text-sm text-gray-500">Select a block to edit</p>
+              <p className="text-sm text-muted-foreground">Select a block to edit its settings.</p>
             )}
           </div>
-        </div>
+        </aside>
       </div>
     </DragDropProvider>
   );

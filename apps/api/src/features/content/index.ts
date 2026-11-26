@@ -13,15 +13,17 @@
  * Plugins can register new content types by using different `type` values.
  */
 import type { FastifyInstance } from 'fastify';
-import type { FeaturePlugin } from '@typepress/core';
+import type { FeatureContext, FeaturePlugin } from '@typepress/core';
 import { content_routes } from './content.routes';
+import { ContentService } from './content.service';
 
 export const content_feature: FeaturePlugin = {
   name: 'content',
   version: '0.1.0',
   dependencies: ['auth'],
 
-  async register(app: FastifyInstance) {
-    await app.register(content_routes);
+  async register(app: FastifyInstance, context: FeatureContext) {
+    const content_service = new ContentService(context.hooks);
+    await app.register(content_routes, { service: content_service });
   },
 };

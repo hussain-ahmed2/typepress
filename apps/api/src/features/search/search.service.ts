@@ -1,4 +1,5 @@
-import { prisma } from '@typepress/db';
+import { db } from '@typepress/db';
+import { sql } from 'drizzle-orm';
 import type { PaginatedResponse } from '@typepress/shared-types';
 
 export interface SearchResult {
@@ -8,6 +9,21 @@ export interface SearchResult {
   title: string;
   excerpt: string;
   rank: number;
+}
+
+/** Raw row shape returned by the full-text search query. */
+interface SearchResultRow {
+  id: string;
+  type: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  rank: number | string;
+}
+
+/** Raw row shape returned by the count query. */
+interface SearchCountRow {
+  count: number | string;
 }
 
 export class SearchService {
@@ -25,12 +41,12 @@ export class SearchService {
       };
     }
 
-    // Use raw query for full-text search with ranking
-    const where_clause = type
-      ? `AND c.type = '${type}' AND c.status = 'PUBLISHED'`
-      : `AND c.status = 'PUBLISHED'`;
+    // Use parameterized Drizzle sql fragments for full-text search with ranking.
+    // User input (search_term, type, limit, skip) is passed as query parameters,
+    // never interpolated into SQL strings, to prevent SQL injection.
+    const type_filter = type ? sql`AND c.type = ${type}` : sql``;
 
-    const results = await prisma.$queryRawUnsafe<SearchResult[]>(`
+    const search_query = sql`
       SELECT
         c.id,
         c.type,
@@ -39,28 +55,41 @@ export class SearchService {
         COALESCE(c.meta->>'excerpt', '') as excerpt,
         ts_rank(
           to_tsvector('english', c.title || ' ' || COALESCE(c.meta->>'excerpt', '')),
-          plainto_tsquery('english', $1)
+          plainto_tsquery('english', ${search_term})
         ) as rank
       FROM "Content" c
-      WHERE to_tsvector('english', c.title || ' ' || COALESCE(c.meta->>'excerpt', '')) @@ plainto_tsquery('english', $1)
-      ${where_clause}
+      WHERE to_tsvector('english', c.title || ' ' || COALESCE(c.meta->>'excerpt', '')) @@ plainto_tsquery('english', ${search_term})
+      ${type_filter}
+      AND c.status = 'PUBLISHED'
       ORDER BY rank DESC, c.updated_at DESC
-      LIMIT $2 OFFSET $3
-    `, search_term, limit, skip);
+      LIMIT ${limit} OFFSET ${skip}
+    `;
 
-    const count_result = await prisma.$queryRawUnsafe<{ count: bigint }[]>(`
-      SELECT COUNT(*) as count
+    const count_query = sql`
+      SELECT COUNT(*)::int as count
       FROM "Content" c
-      WHERE to_tsvector('english', c.title || ' ' || COALESCE(c.meta->>'excerpt', '')) @@ plainto_tsquery('english', $1)
-      ${where_clause}
-    `, search_term);
+      WHERE to_tsvector('english', c.title || ' ' || COALESCE(c.meta->>'excerpt', '')) @@ plainto_tsquery('english', ${search_term})
+      ${type_filter}
+      AND c.status = 'PUBLISHED'
+    `;
 
-    const total = Number(count_result[0]?.count ?? 0);
+    const [search_result, count_result] = await Promise.all([
+      db.execute(search_query),
+      db.execute(count_query),
+    ]);
+
+    // Drizzle node-postgres execute returns a QueryResult with typed rows.
+    const results = search_result.rows as unknown as SearchResultRow[];
+    const count_rows = count_result.rows as unknown as SearchCountRow[];
+    const total = Number(count_rows[0]?.count ?? 0);
 
     return {
       success: true,
       data: results.map((r) => ({
-        ...r,
+        id: r.id,
+        type: r.type,
+        slug: r.slug,
+        title: r.title,
         excerpt: r.excerpt || '',
         rank: Number(r.rank),
       })),

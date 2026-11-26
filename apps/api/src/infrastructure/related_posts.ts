@@ -7,7 +7,8 @@
  *   3. Rank by number of shared taxonomies
  *   4. Return top N results
  */
-import { prisma } from '@typepress/db';
+import { db, contents, taxonomy_relations } from '@typepress/db';
+import { and, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 
 export interface RelatedPost {
   id: string;
@@ -23,39 +24,48 @@ export class RelatedPostsService {
    */
   async find(content_id: string, limit = 5): Promise<RelatedPost[]> {
     // Get current content's taxonomies
-    const content = await prisma.content.findUnique({
-      where: { id: content_id },
-      include: {
-        taxonomies: { select: { taxonomy_id: true } },
-      },
-    });
+    const content_taxonomies = await db
+      .select({ taxonomy_id: taxonomy_relations.taxonomy_id })
+      .from(taxonomy_relations)
+      .where(eq(taxonomy_relations.content_id, content_id));
 
-    if (!content || content.taxonomies.length === 0) return [];
+    if (content_taxonomies.length === 0) return [];
 
-    const taxonomy_ids = content.taxonomies.map((t) => t.taxonomy_id);
+    const taxonomy_ids = content_taxonomies.map((t) => t.taxonomy_id);
 
-    // Find other content with the same taxonomies
-    const related = await prisma.taxonomyRelation.groupBy({
-      by: ['content_id'],
-      where: {
-        taxonomy_id: { in: taxonomy_ids },
-        content_id: { not: content_id },
-      },
-      _count: { taxonomy_id: true },
-      orderBy: { _count: { taxonomy_id: 'desc' } },
-      take: limit,
-    });
+    // Find other content with the same taxonomies, ranked by shared count.
+    const shared_count = sql<number>`count(${taxonomy_relations.taxonomy_id})::int`;
+    const related = await db
+      .select({
+        content_id: taxonomy_relations.content_id,
+        shared_taxonomies: shared_count,
+      })
+      .from(taxonomy_relations)
+      .where(
+        and(
+          inArray(taxonomy_relations.taxonomy_id, taxonomy_ids),
+          ne(taxonomy_relations.content_id, content_id),
+        ),
+      )
+      .groupBy(taxonomy_relations.content_id)
+      .orderBy(desc(shared_count))
+      .limit(limit);
 
     if (related.length === 0) return [];
 
-    // Fetch content details
+    // Fetch content details for published matches only.
     const content_ids = related.map((r) => r.content_id);
-    const contents = await prisma.content.findMany({
-      where: { id: { in: content_ids }, status: 'PUBLISHED' },
-      select: { id: true, slug: true, title: true, type: true },
-    });
+    const related_contents = await db
+      .select({
+        id: contents.id,
+        slug: contents.slug,
+        title: contents.title,
+        type: contents.type,
+      })
+      .from(contents)
+      .where(and(inArray(contents.id, content_ids), eq(contents.status, 'PUBLISHED')));
 
-    const content_map = new Map(contents.map((c) => [c.id, c]));
+    const content_map = new Map(related_contents.map((c) => [c.id, c]));
 
     return related
       .map((r) => {
@@ -66,7 +76,7 @@ export class RelatedPostsService {
           slug: c.slug,
           title: c.title,
           type: c.type,
-          shared_taxonomies: r._count.taxonomy_id,
+          shared_taxonomies: r.shared_taxonomies,
         };
       })
       .filter((r): r is RelatedPost => r !== null);

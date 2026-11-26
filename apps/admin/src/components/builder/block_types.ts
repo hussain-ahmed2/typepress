@@ -1,14 +1,17 @@
 /**
  * Block Types — Defines all available blocks for the page builder.
+ *
+ * Default color values are content defaults for new blocks, not UI theme tokens.
  */
 import type { LucideIcon } from 'lucide-react';
 import { Type, Heading1, Image, MousePointerClick, Minus, Container } from 'lucide-react';
+import type { BuilderBlockPropValue, BuilderBlockType } from '@typepress/shared-types';
 
 export interface BlockType {
-  type: string;
+  type: BuilderBlockType;
   label: string;
   icon: LucideIcon;
-  defaultProps: Record<string, unknown>;
+  defaultProps: Record<string, BuilderBlockPropValue>;
   settings: PropertyDef[];
 }
 

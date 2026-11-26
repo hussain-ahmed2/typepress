@@ -53,7 +53,7 @@ HeadingBlock.craft = {
     text: 'Heading',
     level: 2 as const,
     fontSize: 32,
-    color: '#111827',
+    color: '#111827', // Content default; user-editable.
     textAlign: 'left',
   } as HeadingBlockProps,
   related: {},

@@ -73,7 +73,7 @@ TextBlock.craft = {
   props: {
     text: 'Text',
     fontSize: 16,
-    color: '#000000',
+    color: '#000000', // Content default; user-editable.
     textAlign: 'left',
     fontWeight: 'normal',
   } as TextBlockProps,

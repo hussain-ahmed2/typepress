@@ -34,7 +34,7 @@ export function DividerBlock({ style, color, thickness, margin }: DividerBlockPr
 DividerBlock.craft = {
   props: {
     style: 'solid' as const,
-    color: '#e5e7eb',
+    color: '#e5e7eb', // Content default; user-editable.
     thickness: 1,
     margin: 16,
   } as DividerBlockProps,
